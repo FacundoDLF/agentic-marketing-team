@@ -1,6 +1,74 @@
 import { defineEventHandler, createError } from 'h3'
 import { randomUUID } from 'node:crypto'
-import { NewsIdeaSchema, NewsIdeasResponseSchema, type NewsIdea, type ExtractedNews } from '../../../entities/news/types'
+import { GoogleGenAI, Type } from '@google/genai'
+import { NewsIdeasResponseSchema, type ExtractedNews, type NewsIdea } from '../../../entities/news/types'
+import { getFirestoreDb, FieldValue } from '../../../server/utils/firebase'
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
+/**
+ * JSON Schema for Gemini Structured Outputs (@google/genai SDK)
+ */
+const newsIdeaJsonSchema = {
+  type: Type.ARRAY,
+  description: 'Lista de exactamente 10 ideas de contenido generadas a partir de las noticias proveídas',
+  items: {
+    type: Type.OBJECT,
+    properties: {
+      id: {
+        type: Type.STRING,
+        description: 'Identificador único UUID v4 para la idea',
+      },
+      sourceUrl: {
+        type: Type.STRING,
+        description: 'URL fuente exacta de la noticia de donde proviene la idea',
+      },
+      headline: {
+        type: Type.STRING,
+        description: 'Titular de la noticia analizada',
+      },
+      contentIdea: {
+        type: Type.STRING,
+        description: 'Propuesta estratégica de contenido en formato Markdown estructurado con Hook, Desarrollo y Call to Action (CTA)',
+      },
+      platforms: {
+        type: Type.ARRAY,
+        items: {
+          type: Type.STRING,
+        },
+        description: 'Plataformas optimizadas para este contenido (Instagram Reel, TikTok, YouTube Short, YouTube Long, Instagram Carousel, etc.)',
+      },
+      status: {
+        type: Type.STRING,
+        description: 'Estado inicial de la idea (siempre pending_review)',
+      },
+      createdAt: {
+        type: Type.STRING,
+        description: 'Fecha y hora de generación en formato ISO 8601',
+      },
+    },
+    required: ['id', 'sourceUrl', 'headline', 'contentIdea', 'platforms', 'status', 'createdAt'],
+  },
+}
+
+/**
+ * System Prompt para el Agente 1 (News Scraper & Content Ideation)
+ */
+const systemInstruction = `Eres un Estratega de Contenido y Director Creativo de Marketing de nivel Senior para una agencia de crecimiento y marcas tecnológicas.
+Tu objetivo es analizar un conjunto de noticias de última hora sobre tecnología, marketing e inteligencia artificial, y transformarlas en exactamente 10 ideas de contenido viral y de alto impacto para redes sociales.
+
+REGLAS ESTRICTAS DE SEGURIDAD Y CALIDAD (CERO ALUCINACIONES):
+1. CERO ALUCINACIONES: Solo debes generar ideas a partir de las noticias que se te proveen en el prompt de entrada. Cada idea DEBE estar vinculada a una 'sourceUrl' real y verificable tomada de las noticias dadas.
+2. DIVERSIDAD MULTIPLATAFORMA: Distribuye las 10 ideas cubriendo una mezcla equilibrada de formatos:
+   - Instagram (Reels dinámicos, Carruseles educativos)
+   - YouTube (Shorts con ganchos rápidos, Videos largos estilo tutorial/análisis)
+   - TikTok (Tendencias explicativas, detrás de escena, storytelling)
+3. ESTRUCTURA DE 'contentIdea': Cada propuesta debe redactarse en Markdown limpio y profesional incluyendo:
+   - Formato sugerido (ej. "### Reel / TikTok: ...")
+   - **Hook (Gancho):** Primeros 3 segundos para captar atención.
+   - **Desarrollo:** Puntos clave o guión paso a paso del contenido.
+   - **CTA (Llamado a la acción):** Pregunta o palabra clave para generar interacción y captar leads.
+4. Genera identificadores UUID válidos para el campo 'id', define 'status' como 'pending_review' y 'createdAt' en formato ISO 8601.`
 
 /**
  * AGENTE 1: News Scraper & Content Ideation
@@ -9,30 +77,40 @@ import { NewsIdeaSchema, NewsIdeasResponseSchema, type NewsIdea, type ExtractedN
  * Pipeline:
  * 1. Extracción: Obtiene noticias relevantes (Mockeado: 3 noticias)
  * 2. Filtrado: Descarta contenido negativo / no alineado
- * 3. Ideación (LLM Gemini): Genera ideas de contenido multiplataforma
- * 4. Validación: Valida con esquema Zod (NewsIdeaSchema)
- * 5. Almacenamiento: Guarda en Firestore (TODO)
+ * 3. Ideación (LLM Gemini 1.5 Flash): Genera 10 ideas de contenido con Structured Outputs
+ * 4. Validación: Valida con esquema Zod (NewsIdeasResponseSchema)
+ * 5. Almacenamiento: Guarda en Firestore (Fase C)
  */
 export default defineEventHandler(async (event) => {
   try {
+    const config = useRuntimeConfig()
+    const apiKey = (config.geminiApiKey as string) || process.env.NUXT_GEMINI_API_KEY
+
+    if (!apiKey || apiKey === 'tu_api_key_aqui') {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'API Key de Gemini no configurada. Por favor define tu clave en el archivo .env (NUXT_GEMINI_API_KEY).',
+      })
+    }
+
     // --- Paso 1: Extracción Web (Mock de Brave Search MCP / Tavily) ---
     const extractedNews: ExtractedNews[] = [
       {
         headline: 'OpenAI presenta nuevo modelo o3 con capacidades avanzadas de razonamiento',
         sourceUrl: 'https://techcrunch.com/2026/openai-o3-announcement',
-        snippet: 'OpenAI ha anunciado su nuevo modelo enfocado en resolver problemas complejos de matemáticas, código y ciencias.',
+        snippet: 'OpenAI ha anunciado su nuevo modelo enfocado en resolver problemas complejos de matemáticas, código y ciencias con razonamiento paso a paso.',
         publishedAt: new Date().toISOString(),
       },
       {
         headline: 'Google Cloud expande integración de agentes autónomos para empresas',
         sourceUrl: 'https://cloud.google.com/blog/products/ai-machine-learning/enterprise-agents',
-        snippet: 'Nuevas soluciones de orquestación de agentes IA permiten automatizar flujos de marketing, ventas y soporte en tiempo real.',
+        snippet: 'Nuevas soluciones de orquestación de agentes IA permiten automatizar flujos de marketing, ventas y soporte en tiempo real con observabilidad integral.',
         publishedAt: new Date().toISOString(),
       },
       {
         headline: 'Meta lanza herramientas de creación publicitaria basadas en IA generativa',
         sourceUrl: 'https://about.fb.com/news/2026/meta-ai-ads-suite',
-        snippet: 'Las nuevas APIs permiten a marcas crear variaciones infinitas de creativos para Reels y Stories optimizados por audiencia.',
+        snippet: 'Las nuevas APIs permiten a marcas crear variaciones infinitas de creativos para Reels y Stories optimizados automáticamente según la audiencia.',
         publishedAt: new Date().toISOString(),
       },
     ]
@@ -55,75 +133,95 @@ export default defineEventHandler(async (event) => {
       return !negativeKeywords.some((kw) => text.includes(kw))
     })
 
-    // --- Paso 3: Ideación con LLM (Gemini 1.5 Flash / Pro) ---
-    /*
-     * TODO: Inyectar SDK @google/genai cuando las credenciales estén listas en runtimeConfig.
-     * Ejemplo de integración con Gemini:
-     * 
-     * import { GoogleGenAI, Type } from '@google/genai'
-     * const ai = new GoogleGenAI({ apiKey: useRuntimeConfig().geminiApiKey })
-     * const response = await ai.models.generateContent({
-     *   model: 'gemini-1.5-flash',
-     *   contents: [
-     *     { role: 'system', text: 'Eres un estratega de contenido senior...' },
-     *     { role: 'user', text: JSON.stringify(filteredNews) }
-     *   ],
-     *   config: {
-     *     responseMimeType: 'application/json',
-     *     responseSchema: { ... }
-     *   }
-     * })
-     */
+    if (filteredNews.length === 0) {
+      return {
+        success: true,
+        count: 0,
+        data: [],
+        message: 'Todas las noticias fueron descartadas por los filtros de seguridad.',
+      }
+    }
 
-    // Mock estructurado de la respuesta de Gemini (simulando 3 ideas multiplataforma a partir de las noticias)
-    const rawGeneratedIdeas: NewsIdea[] = [
-      {
-        id: randomUUID(),
-        sourceUrl: filteredNews[0].sourceUrl,
-        headline: filteredNews[0].headline,
-        contentIdea: `### Reel / Short: ¿Qué significa OpenAI o3 para tu trabajo diario?\n\n**Hook:** "Si creías que GPT-4 era rápido, mira lo que hace o3 en 3 segundos..."\n**Desarrollo:** Demostración de resolución de problemas paso a paso.\n**CTA:** Comenta 'AGENTES' para enviarte la guía de adopción.`,
-        platforms: ['Instagram Reel', 'TikTok', 'YouTube Short'],
-        status: 'pending_review',
-        createdAt: new Date().toISOString(),
+    // --- Paso 3: Ideación con Gemini Flash (Structured Outputs) ---
+    const ai = new GoogleGenAI({ apiKey })
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-flash-latest',
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `Aquí tienes las noticias filtradas del día para ideación de contenido:\n\n${JSON.stringify(filteredNews, null, 2)}\n\nGenera exactamente 10 ideas de contenido innovadoras, estructuradas y listas para revisión humana.`,
+            },
+          ],
+        },
+      ],
+      config: {
+        systemInstruction,
+        responseMimeType: 'application/json',
+        responseSchema: newsIdeaJsonSchema,
+        temperature: 0.7,
       },
-      {
-        id: randomUUID(),
-        sourceUrl: filteredNews[1].sourceUrl,
-        headline: filteredNews[1].headline,
-        contentIdea: `### Carrusel Educativo: 3 Agentes de IA que toda empresa debe implementar en 2026\n\n1. **Agente Scraper de Tendencias** (Monitoreo continuo)\n2. **Agente Calificador de Leads** (Scoring instantáneo)\n3. **Agente Copiloto de Ventas**\n\n**Slide final:** Guarda este carrusel para tu próxima reunión de estrategia.`,
-        platforms: ['Instagram Carousel', 'LinkedIn Post'],
-        status: 'pending_review',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: randomUUID(),
-        sourceUrl: filteredNews[2].sourceUrl,
-        headline: filteredNews[2].headline,
-        contentIdea: `### Video Largo / Tutorial: Cómo automatizar creativos con las nuevas herramientas de Meta\n\n- Análisis de la nueva suite de anuncios con IA\n- Comparativa de costo por adquisición (CPA)\n- Paso a paso para conectar los feeds de producto.`,
-        platforms: ['YouTube Long', 'TikTok', 'Instagram Reel'],
-        status: 'pending_review',
-        createdAt: new Date().toISOString(),
-      },
-    ]
+    })
+
+    const rawText = response.text || '[]'
+    let parsedRawData: any
+    try {
+      parsedRawData = JSON.parse(rawText)
+    } catch {
+      throw createError({
+        statusCode: 502,
+        statusMessage: 'Error al parsear la respuesta estructurada de Gemini como JSON.',
+      })
+    }
+
+    // Normalización defensiva para asegurar cumplimiento con tipos antes de validación Zod
+    const itemsArray = Array.isArray(parsedRawData) ? parsedRawData : [parsedRawData]
+    const preparedIdeas = itemsArray.map((item: any) => ({
+      id: typeof item.id === 'string' && UUID_REGEX.test(item.id) ? item.id : randomUUID(),
+      sourceUrl: typeof item.sourceUrl === 'string' && item.sourceUrl.startsWith('http') ? item.sourceUrl : (filteredNews[0]?.sourceUrl || 'https://techcrunch.com'),
+      headline: item.headline || 'Titular de Noticia',
+      contentIdea: item.contentIdea || 'Idea de contenido generada.',
+      platforms: Array.isArray(item.platforms) && item.platforms.length > 0 ? item.platforms : ['Instagram Reel', 'TikTok'],
+      status: 'pending_review',
+      createdAt: item.createdAt || new Date().toISOString(),
+    }))
 
     // --- Paso 4: Validación con Zod ---
-    const validatedIdeas = NewsIdeasResponseSchema.parse(rawGeneratedIdeas)
+    const validatedIdeas: NewsIdea[] = NewsIdeasResponseSchema.parse(preparedIdeas)
 
-    // --- Paso 5: Almacenamiento en Firestore ---
-    // TODO: Guardar `validatedIdeas` en la colección `news_ideas` de Firestore
-    // const db = getFirestore()
-    // const batch = db.batch()
-    // validatedIdeas.forEach(idea => batch.set(db.collection('news_ideas').doc(idea.id), idea))
-    // await batch.commit()
+    // --- Paso 5: Almacenamiento en Firestore (Fase C) ---
+    const firestore = getFirestoreDb()
+    const batch = firestore.batch()
+    const collectionRef = firestore.collection('news_ideas')
+
+    for (const idea of validatedIdeas) {
+      const docRef = collectionRef.doc(idea.id)
+      batch.set(docRef, {
+        id: idea.id,
+        sourceUrl: idea.sourceUrl,
+        headline: idea.headline,
+        contentIdea: idea.contentIdea,
+        platforms: idea.platforms,
+        status: 'pending_review',
+        createdAt: FieldValue.serverTimestamp(),
+      })
+    }
+
+    await batch.commit()
 
     return {
       success: true,
       count: validatedIdeas.length,
       data: validatedIdeas,
       executedAt: new Date().toISOString(),
-      message: 'Agente 1 ejecutado exitosamente.',
+      message: 'Agente 1 ejecutado exitosamente. Ideas generadas y persistidas en Firestore.',
     }
   } catch (error: any) {
+    if (error?.statusCode) {
+      throw error
+    }
     throw createError({
       statusCode: 500,
       statusMessage: `Error en Agente 1 (ScraperNews): ${error?.message || 'Error desconocido'}`,
