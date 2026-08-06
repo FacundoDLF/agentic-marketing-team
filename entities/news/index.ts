@@ -1,2 +1,3 @@
+export * from './types'
 export * from './model/types'
 export * from './model/mock-data'

@@ -5,9 +5,9 @@
  * Composes AppSidebar + AppTopbar around the page content.
  * Computes the page title from the current route using tabMeta.
  */
-import AppSidebar from '~~/shared/ui/AppSidebar.vue'
-import AppTopbar from '~~/shared/ui/AppTopbar.vue'
-import { tabMeta, resolveTabId } from '~~/shared/config/navigation'
+import { tabMeta, resolveTabId } from '../../shared/config/navigation'
+import AppSidebar from '../../shared/ui/AppSidebar.vue'
+import AppTopbar from '../../shared/ui/AppTopbar.vue'
 
 const route = useRoute()
 

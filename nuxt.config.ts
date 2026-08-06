@@ -5,8 +5,18 @@ export default defineNuxtConfig({
 
   modules: ['@nuxtjs/tailwindcss'],
 
-  // ~/assets resolves to app/assets (srcDir = app/)
-  css: ['~/assets/css/main.css'],
+  srcDir: '.',
+  dir: {
+    app: 'app',
+    assets: 'app/assets',
+    layouts: 'app/layouts',
+    middleware: 'app/middleware',
+    pages: 'app/pages',
+    plugins: 'app/plugins',
+    shared: 'shared/lib',
+  },
+
+  css: ['~/app/assets/css/main.css'],
 
   // Ensure Nuxt auto-imports work for FSD layers outside app/
   // ~~ resolves to rootDir (project root)
@@ -18,12 +28,22 @@ export default defineNuxtConfig({
     ],
   },
 
-  // Register shared/ui and widgets for auto-import
-  // ~~ resolves to rootDir (project root)
-  components: [
-    { path: '~~/shared/ui', prefix: '' },
-    { path: '~~/widgets', pathPrefix: false },
-  ],
+
+  // Ensure Vite SSR bundles all project layers and lucide components
+  build: {
+    transpile: [
+      '@lucide/vue',
+      /shared/,
+      /widgets/,
+      /features/,
+      /entities/,
+    ],
+  },
+  vite: {
+    ssr: {
+      noExternal: true,
+    },
+  },
 
   // Extend the generated tsconfig to include FSD layers
   // so the IDE and compiler resolve Nuxt auto-imports and types seamlessly
