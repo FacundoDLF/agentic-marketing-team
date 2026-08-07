@@ -18,7 +18,7 @@
 | Nivel de Tarea | Complejidad Cognitiva | Modelo Asignado | Casos de Uso |
 | :--- | :--- | :--- | :--- |
 | **Tier 1: High-Volume / Extracción / Ideación** | Baja a Media (Velocidad, Extracción JSON, Deduplicación, Ideación breve) | `gemini-3.5-flash-lite` | **Scrapy Agent (Agente 1)**: News Scraping, filtrado temático, estructuración de ideas crudas. |
-| **Tier 2: Copywriting Creativo / Multi-Formato** | Alta (Tono de voz, Guiones extensos, Adaptación de canal, Carousels, Hooks) | `gemini-2.5-pro` o `gemini-3.5-flash` | **Writer Agent (Agente 2)**: Redacción final de copys, guiones de video, storytelling de marca. |
+| **Tier 2: Copywriting Creativo / Multi-Formato** | Media-Alta (Hooks magnéticos, Guiones de video, Captions, Hashtags, CTA) | `gemini-3.5-flash-lite` (Dev/Prod) / `gemini-2.5-pro` (Deep copy) | **Coppy-Hook Agent (Agente 2)**: Redacción creativa estructurada, guiones y captions listos para publicar. |
 | **Tier 3: Supervisión & QA** | Media-Alta (Validación semántica, Moderación, Compliance) | `gemini-3.5-flash` | **Supervisor / QA Agent**: Auditoría de calidad y validación de directrices de marca. |
 
 ---

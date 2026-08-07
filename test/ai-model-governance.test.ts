@@ -75,4 +75,24 @@ describe('ASDD AI Model Governance Guardian', () => {
 
     expect(hasThrottling, 'ASDD Error: Scraper no incluye throttling de 4000ms').toBe(true)
   })
+
+  it('should verify Coppy-Hook Agent (copyhook.post.ts) exists and is right-sized to gemini-3.5-flash-lite', () => {
+    const copyhookPath = path.join(agentsDir, 'copyhook.post.ts')
+    expect(fs.existsSync(copyhookPath), 'ASDD Error: copyhook.post.ts no existe').toBe(true)
+
+    const content = fs.readFileSync(copyhookPath, 'utf-8')
+    const modelMatch = content.match(/export\s+const\s+AI_MODEL\s*=\s*['"`]([^'"`]+)['"`]/)
+    expect(modelMatch, 'ASDD Error: Feature de IA sin modelo explícito asignado en copyhook.post.ts').not.toBeNull()
+    expect(modelMatch![1]).toBe('gemini-3.5-flash-lite')
+  })
+
+  it('should verify 4s throttling exists in copyhook.post.ts', () => {
+    const copyhookPath = path.join(agentsDir, 'copyhook.post.ts')
+    const content = fs.readFileSync(copyhookPath, 'utf-8')
+
+    const hasThrottling =
+      content.includes('setTimeout(r, 4000)') || content.includes('setTimeout(resolve, 4000)')
+
+    expect(hasThrottling, 'ASDD Error: Coppy-Hook Agent no incluye throttling de 4000ms').toBe(true)
+  })
 })
