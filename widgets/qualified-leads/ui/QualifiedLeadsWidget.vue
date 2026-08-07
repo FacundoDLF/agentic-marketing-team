@@ -1,11 +1,11 @@
 <script setup lang="ts">
 /**
- * QualifiedLeadsWidget — Leads agent (Agent 3) qualified prospects table.
- *
- * FSD Layer: widgets/qualified-leads
+ * QualifiedLeadsWidget: Leads agent qualified prospects table.
+ * Layer: widgets/qualified-leads
  */
 import { Users } from '@lucide/vue'
 import { qualifiedLeads } from '~~/entities/lead'
+import { SECTIONS } from '~~/shared/constants'
 import { cn } from '~~/shared/lib/utils'
 
 function scoreColor(score: number): string {
@@ -31,17 +31,17 @@ function getInitials(name: string): string {
         <Users class="h-4 w-4" />
       </div>
       <div>
-        <h2 class="text-sm font-semibold">Leads Calificados</h2>
-        <p class="text-xs text-muted-foreground">Leads (Agente 3)</p>
+        <h2 class="text-sm font-semibold">{{ SECTIONS.LEADS.title }}</h2>
+        <p class="text-xs text-muted-foreground">
+          {{ SECTIONS.LEADS.label }} ({{ SECTIONS.LEADS.agent }})
+        </p>
       </div>
     </header>
 
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr
-            class="border-b border-border text-left text-xs text-muted-foreground"
-          >
+          <tr class="border-b border-border text-left text-xs text-muted-foreground">
             <th class="px-5 py-2.5 font-medium">Nombre</th>
             <th class="px-5 py-2.5 font-medium">Empresa</th>
             <th class="px-5 py-2.5 text-right font-medium">Match</th>

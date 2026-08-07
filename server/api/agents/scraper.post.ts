@@ -4,7 +4,11 @@ import Parser from 'rss-parser'
 import { GoogleGenAI, Type } from '@google/genai'
 import { getFirestoreDb, FieldValue } from '../../../server/utils/firebase'
 import { AGENTS } from '../../../shared/constants/agents'
-import { NewsIdeasResponseSchema, type ExtractedNews, type NewsIdea } from '../../../entities/news/types'
+import {
+  NewsIdeasResponseSchema,
+  type ExtractedNews,
+  type NewsIdea,
+} from '../../../entities/news/types'
 
 /**
  * ASDD AI Model Governance: Scrapy Agent (News Scraper & Content Ideation)
@@ -19,7 +23,8 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-
  */
 const newsIdeaJsonSchema = {
   type: Type.ARRAY,
-  description: 'Lista de ideas de contenido estratégico para JL Masajistas generadas a partir de las noticias reales provistas',
+  description:
+    'Lista de ideas de contenido estratégico para JL Masajistas generadas a partir de las noticias reales provistas',
   items: {
     type: Type.OBJECT,
     properties: {
@@ -29,7 +34,8 @@ const newsIdeaJsonSchema = {
       },
       sourceUrl: {
         type: Type.STRING,
-        description: 'URL fuente exacta e inalterada de la noticia real de donde proviene la idea (tomada estrictamente del listado proveído)',
+        description:
+          'URL fuente exacta e inalterada de la noticia real de donde proviene la idea (tomada estrictamente del listado proveído)',
       },
       headline: {
         type: Type.STRING,
@@ -37,14 +43,16 @@ const newsIdeaJsonSchema = {
       },
       contentIdea: {
         type: Type.STRING,
-        description: 'Propuesta estratégica de contenido en formato Markdown estructurado con Hook (3 seg), Desarrollo y Call to Action (CTA)',
+        description:
+          'Propuesta estratégica de contenido en formato Markdown estructurado con Hook (3 seg), Desarrollo y Call to Action (CTA)',
       },
       platforms: {
         type: Type.ARRAY,
         items: {
           type: Type.STRING,
         },
-        description: 'Plataformas optimizadas para este contenido (Instagram Reel, TikTok, YouTube Short, YouTube Long, Instagram Carousel)',
+        description:
+          'Plataformas optimizadas para este contenido (Instagram Reel, TikTok, YouTube Short, YouTube Long, Instagram Carousel)',
       },
       status: {
         type: Type.STRING,
@@ -128,8 +136,10 @@ const NEGATIVE_KEYWORDS = [
 type ScraperTimeframe = '1d' | '90d' | '180d' | 'next_15d' | 'next_30d'
 
 // --- Configuración de queries RSS (separadas para el patrón Divide y Vencerás) ---
-const QUERY_INDUSTRY = '(kinesiologia+OR+masajes+OR+%22bienestar+corporativo%22+OR+fisiatria+OR+%22salud+ocupacional%22)+AND+(%22Rosario%22+OR+location:rosario)'
-const QUERY_SEASONAL = '(%22D%C3%ADa+de+la+Madre%22+OR+%22San+Valentin%22+OR+%22D%C3%ADa+del+Maestro%22+OR+%22D%C3%ADa+de+la+Secretaria%22+OR+%22Primavera%22+OR+%22Gift+Card%22+OR+%22Navidad%22+OR+%22Regalos%22)+AND+(%22Rosario%22+OR+location:rosario)'
+const QUERY_INDUSTRY =
+  '(kinesiologia+OR+masajes+OR+%22bienestar+corporativo%22+OR+fisiatria+OR+%22salud+ocupacional%22)+AND+(%22Rosario%22+OR+location:rosario)'
+const QUERY_SEASONAL =
+  '(%22D%C3%ADa+de+la+Madre%22+OR+%22San+Valentin%22+OR+%22D%C3%ADa+del+Maestro%22+OR+%22D%C3%ADa+de+la+Secretaria%22+OR+%22Primavera%22+OR+%22Gift+Card%22+OR+%22Navidad%22+OR+%22Regalos%22)+AND+(%22Rosario%22+OR+location:rosario)'
 
 const RSS_BASE = 'https://news.google.com/rss/search'
 const RSS_PARAMS = '&hl=es-419&gl=AR&ceid=AR:es-419'
@@ -193,7 +203,8 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        message: 'API Key de Gemini no configurada. Por favor define tu clave en el archivo .env (NUXT_GEMINI_API_KEY).',
+        message:
+          'API Key de Gemini no configurada. Por favor define tu clave en el archivo .env (NUXT_GEMINI_API_KEY).',
       })
     }
 
@@ -225,7 +236,9 @@ export default defineEventHandler(async (event) => {
         const url = doc.data()?.sourceUrl
         if (url) processedUrls.add(url)
       })
-      console.info(`[Scrapy Agent] Deduplicación global: ${processedUrls.size} URLs históricas en Firestore`)
+      console.info(
+        `[Scrapy Agent] Deduplicación global: ${processedUrls.size} URLs históricas en Firestore`,
+      )
     } catch (fsError: any) {
       console.warn(`[Scrapy Agent] Error al consultar URLs históricas: ${fsError?.message}`)
     }
@@ -274,7 +287,8 @@ export default defineEventHandler(async (event) => {
       try {
         const html = await $fetch<string>(manualUrl, {
           headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
           },
           timeout: 8000,
         })
@@ -282,17 +296,26 @@ export default defineEventHandler(async (event) => {
         // 1. Extraer título
         const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/is)
         if (titleMatch && titleMatch[1]) {
-          headline = titleMatch[1].replace(/(\r\n|\n|\r)/gm, ' ').replace(/&nbsp;/g, ' ').trim()
+          headline = titleMatch[1]
+            .replace(/(\r\n|\n|\r)/gm, ' ')
+            .replace(/&nbsp;/g, ' ')
+            .trim()
         }
 
         // Helper genérico para extraer tags por name o property
         const getMetaContent = (namesOrProps: string[]): string => {
           for (const key of namesOrProps) {
-            const regex1 = new RegExp(`<meta[^>]+(?:name|property)=["']${key}["'][^>]+content=["']([^"']*)["']`, 'is')
+            const regex1 = new RegExp(
+              `<meta[^>]+(?:name|property)=["']${key}["'][^>]+content=["']([^"']*)["']`,
+              'is',
+            )
             const match1 = html.match(regex1)
             if (match1 && match1[1]) return match1[1].trim()
 
-            const regex2 = new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]+(?:name|property)=["']${key}["']`, 'is')
+            const regex2 = new RegExp(
+              `<meta[^>]+content=["']([^"']*)["'][^>]+(?:name|property)=["']${key}["']`,
+              'is',
+            )
             const match2 = html.match(regex2)
             if (match2 && match2[1]) return match2[1].trim()
           }
@@ -309,9 +332,17 @@ export default defineEventHandler(async (event) => {
         keywords = getMetaContent(['keywords', 'article:tag', 'news_keywords', 'tags'])
 
         // 5. Extraer fecha de publicación
-        pubDateExtracted = getMetaContent(['article:published_time', 'pubdate', 'date', 'og:article:published_time', 'og:published_time'])
+        pubDateExtracted = getMetaContent([
+          'article:published_time',
+          'pubdate',
+          'date',
+          'og:article:published_time',
+          'og:published_time',
+        ])
       } catch (fetchErr: any) {
-        console.warn(`[Scrapy Agent] No se pudo scrapear metadata de la URL manual: ${fetchErr?.message}`)
+        console.warn(
+          `[Scrapy Agent] No se pudo scrapear metadata de la URL manual: ${fetchErr?.message}`,
+        )
       }
 
       // Construir contexto enriquecido estructurado para Gemini
@@ -322,18 +353,23 @@ export default defineEventHandler(async (event) => {
 
       const enrichedSnippet = metaParts.length > 0 ? metaParts.join(' | ') : headline
 
-      targetNews = [{
-        headline,
-        sourceUrl: manualUrl,
-        snippet: enrichedSnippet,
-        publishedAt: pubDateExtracted && !isNaN(new Date(pubDateExtracted).getTime())
-          ? new Date(pubDateExtracted).toISOString()
-          : new Date().toISOString(),
-      }]
+      targetNews = [
+        {
+          headline,
+          sourceUrl: manualUrl,
+          snippet: enrichedSnippet,
+          publishedAt:
+            pubDateExtracted && !isNaN(new Date(pubDateExtracted).getTime())
+              ? new Date(pubDateExtracted).toISOString()
+              : new Date().toISOString(),
+        },
+      ]
     } else {
       // --- FLUJO B: ESCANEO AUTOMÁTICO GOOGLE NEWS RSS ---
       if (slotsLibres <= 0) {
-        console.info(`[Scrapy Agent] Bandeja llena (${pendingCount} pendientes). Abortando escaneo.`)
+        console.info(
+          `[Scrapy Agent] Bandeja llena (${pendingCount} pendientes). Abortando escaneo.`,
+        )
         return {
           success: true,
           count: 0,
@@ -342,17 +378,19 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      const timeframe: ScraperTimeframe =
-        (['1d', '90d', '180d', 'next_15d', 'next_30d'] as const).includes(body?.timeframe)
-          ? (body.timeframe as ScraperTimeframe)
-          : '1d'
+      const timeframe: ScraperTimeframe = (
+        ['1d', '90d', '180d', 'next_15d', 'next_30d'] as const
+      ).includes(body?.timeframe)
+        ? (body.timeframe as ScraperTimeframe)
+        : '1d'
 
       const temporal = buildTemporalContext(timeframe)
       console.info(`[Scrapy Agent] timeframe=${timeframe} | ${temporal.label}`)
 
       const parser = new Parser({
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
         },
       })
 
@@ -364,8 +402,10 @@ export default defineEventHandler(async (event) => {
         parser.parseURL(urlSeasonal),
       ])
 
-      const industryItems = industryResult.status === 'fulfilled' ? (industryResult.value.items || []) : []
-      const seasonalItems = seasonalResult.status === 'fulfilled' ? (seasonalResult.value.items || []) : []
+      const industryItems =
+        industryResult.status === 'fulfilled' ? industryResult.value.items || [] : []
+      const seasonalItems =
+        seasonalResult.status === 'fulfilled' ? seasonalResult.value.items || [] : []
 
       if (industryResult.status === 'rejected') {
         console.warn(`[Scrapy Agent] Query industria falló: ${industryResult.reason?.message}`)
@@ -437,7 +477,9 @@ export default defineEventHandler(async (event) => {
 
       const articlesNeeded = Math.ceil(slotsLibres / 2)
       targetNews = filteredNews.slice(0, articlesNeeded)
-      console.info(`[Scrapy Agent] Llenado exacto: slotsLibres=${slotsLibres}, articlesNeeded=${articlesNeeded}, targetNews=${targetNews.length}`)
+      console.info(
+        `[Scrapy Agent] Llenado exacto: slotsLibres=${slotsLibres}, articlesNeeded=${articlesNeeded}, targetNews=${targetNews.length}`,
+      )
     }
 
     // --- Paso 4: Ideación Secuencial con Gemini Lite (Throttling & Right-sizing) ---
@@ -448,7 +490,9 @@ export default defineEventHandler(async (event) => {
       const article = targetNews[i]
       if (!article) continue
 
-      console.info(`[${AGENTS.SCRAPY.name}] (${i + 1}/${targetNews.length}) Ideando con ${AI_MODEL}: "${article.headline.slice(0, 60)}..."`)
+      console.info(
+        `[${AGENTS.SCRAPY.name}] (${i + 1}/${targetNews.length}) Ideando con ${AI_MODEL}: "${article.headline.slice(0, 60)}..."`,
+      )
 
       let response: any = null
       let attempts = 0
@@ -479,10 +523,15 @@ export default defineEventHandler(async (event) => {
           break // Éxito
         } catch (genError: any) {
           const errMsg = String(genError?.message || genError)
-          const isRateLimit = errMsg.includes('429') || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('quota')
+          const isRateLimit =
+            errMsg.includes('429') ||
+            errMsg.includes('RESOURCE_EXHAUSTED') ||
+            errMsg.includes('quota')
 
           if (isRateLimit && attempts < maxAttempts) {
-            console.warn(`[Scrapy Agent] Rate limit temporal en intento ${attempts}. Pausando 4s antes de reintentar...`)
+            console.warn(
+              `[Scrapy Agent] Rate limit temporal en intento ${attempts}. Pausando 4s antes de reintentar...`,
+            )
             await new Promise((r) => setTimeout(r, 4000))
             continue
           }
@@ -518,15 +567,26 @@ export default defineEventHandler(async (event) => {
 
     const preparedIdeas = itemsArray.map((item: any, index: number) => {
       const matchedSource = targetNews.find((n) => n.sourceUrl === item.sourceUrl)
-      const validSourceUrl = matchedSource ? matchedSource.sourceUrl : (targetNews[Math.floor(index / 2) % targetNews.length]?.sourceUrl || fallbackUrl)
-      const publishedAt = matchedSource?.publishedAt || targetNews[Math.floor(index / 2) % targetNews.length]?.publishedAt || new Date().toISOString()
+      const validSourceUrl = matchedSource
+        ? matchedSource.sourceUrl
+        : targetNews[Math.floor(index / 2) % targetNews.length]?.sourceUrl || fallbackUrl
+      const publishedAt =
+        matchedSource?.publishedAt ||
+        targetNews[Math.floor(index / 2) % targetNews.length]?.publishedAt ||
+        new Date().toISOString()
 
       return {
         id: typeof item.id === 'string' && UUID_REGEX.test(item.id) ? item.id : randomUUID(),
         sourceUrl: validSourceUrl,
-        headline: item.headline || (matchedSource?.headline || 'Bienestar y Recuperación Muscular - JL Masajistas'),
+        headline:
+          item.headline ||
+          matchedSource?.headline ||
+          'Bienestar y Recuperación Muscular - JL Masajistas',
         contentIdea: item.contentIdea || 'Propuesta de contenido estratégico para JL Masajistas.',
-        platforms: Array.isArray(item.platforms) && item.platforms.length > 0 ? item.platforms : ['Instagram Reel', 'TikTok'],
+        platforms:
+          Array.isArray(item.platforms) && item.platforms.length > 0
+            ? item.platforms
+            : ['Instagram Reel', 'TikTok'],
         publishedAt,
         status: 'pending_review',
         createdAt: item.createdAt || new Date().toISOString(),
@@ -574,10 +634,20 @@ export default defineEventHandler(async (event) => {
     const rawMessage = String(error?.message || error || '')
     let userFriendlyMessage = rawMessage
 
-    if (rawMessage.includes('429') || rawMessage.includes('RESOURCE_EXHAUSTED') || rawMessage.includes('quota')) {
-      userFriendlyMessage = 'Límite de solicitudes de la API de Gemini alcanzado (Cuota temporal del plan gratuito de Google). Por favor aguardá 10 a 20 segundos antes de volver a escanear.'
-    } else if (rawMessage.includes('API_KEY_INVALID') || rawMessage.includes('401') || rawMessage.includes('403')) {
-      userFriendlyMessage = 'Clave API de Gemini inválida o sin permisos suficientes. Verificá tu NUXT_GEMINI_API_KEY en el archivo .env.'
+    if (
+      rawMessage.includes('429') ||
+      rawMessage.includes('RESOURCE_EXHAUSTED') ||
+      rawMessage.includes('quota')
+    ) {
+      userFriendlyMessage =
+        'Límite de solicitudes de la API de Gemini alcanzado (Cuota temporal del plan gratuito de Google). Por favor aguardá 10 a 20 segundos antes de volver a escanear.'
+    } else if (
+      rawMessage.includes('API_KEY_INVALID') ||
+      rawMessage.includes('401') ||
+      rawMessage.includes('403')
+    ) {
+      userFriendlyMessage =
+        'Clave API de Gemini inválida o sin permisos suficientes. Verificá tu NUXT_GEMINI_API_KEY en el archivo .env.'
     }
 
     throw createError({

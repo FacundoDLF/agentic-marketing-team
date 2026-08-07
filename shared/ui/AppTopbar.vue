@@ -49,9 +49,7 @@ defineProps<{
       class="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-input bg-card text-muted-foreground transition-colors hover:text-foreground"
     >
       <Bell class="h-[18px] w-[18px]" />
-      <span
-        class="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive ring-2 ring-card"
-      />
+      <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-destructive ring-2 ring-card" />
     </button>
 
     <!-- User avatar -->

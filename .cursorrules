@@ -1,10 +1,11 @@
 # ASDD (Agentic Software-Driven Development) — Directivas del Repositorio
 
 ## 1. Principio SSOT (Single Source of Truth) — Obligatorio y Permanente
-Queda estrictamente prohibido duplicar strings mágicos, configuraciones, metadatos de agentes, endpoints o estructuras de datos en múltiples archivos. Cada entidad, constante o regla de negocio debe tener una única fuente de verdad centralizada (en archivos de constantes, utils o tipos compartidos). El IDE tiene la obligación proactiva de identificar duplicaciones o valores hardcodeados durante cualquier refactorización o creación de código, y extraerlos automáticamente hacia su fuente centralizada correspondiente.
+Queda estrictamente prohibido duplicar strings mágicos, configuraciones, metadatos de agentes, nombres de secciones/tabs, endpoints o estructuras de datos en múltiples archivos. Cada entidad, constante o regla de negocio debe tener una única fuente de verdad centralizada (en archivos de constantes, utils o tipos compartidos). El IDE tiene la obligación proactiva de identificar duplicaciones o valores hardcodeados durante cualquier refactorización o creación de código, y extraerlos automáticamente hacia su fuente centralizada correspondiente.
 
 - **Constantes de Agentes**: Centralizadas en `shared/constants/agents.ts` (`AGENTS`).
-- **Navegación y Rutas**: Centralizadas en `shared/config/navigation.ts`.
+- **Secciones, Tabs y Títulos**: Centralizadas en `shared/constants/sections.ts` (`SECTIONS`).
+- **Navegación y Rutas**: Centralizadas en `shared/config/navigation.ts` (`navItems`, `settingsEntry`, `tabMeta`).
 - **Esquemas y Tipos de Datos**: Centralizados en `entities/*/types.ts`.
 - **Servicios de API / Agentes**: Centralizados en `services/agentService.ts`.
 

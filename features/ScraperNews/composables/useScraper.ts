@@ -132,13 +132,11 @@ export function useScraper() {
     }
   }
 
-  const pendingCount = computed(() =>
-    ideas.value.filter((i) => i.status === 'pending_review').length,
+  const pendingCount = computed(
+    () => ideas.value.filter((i) => i.status === 'pending_review').length,
   )
 
-  const approvedCount = computed(() =>
-    ideas.value.filter((i) => i.status === 'approved').length,
-  )
+  const approvedCount = computed(() => ideas.value.filter((i) => i.status === 'approved').length)
 
   return {
     loading,

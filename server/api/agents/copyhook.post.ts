@@ -80,7 +80,8 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        message: 'API Key de Gemini no configurada. Por favor define tu clave en el archivo .env (NUXT_GEMINI_API_KEY).',
+        message:
+          'API Key de Gemini no configurada. Por favor define tu clave en el archivo .env (NUXT_GEMINI_API_KEY).',
       })
     }
 
@@ -103,7 +104,10 @@ export default defineEventHandler(async (event) => {
           if (!sourceUrl && docData?.sourceUrl) sourceUrl = docData.sourceUrl
         }
       } catch (fsErr: any) {
-        console.warn(`[Coppy-Hook Agent] Error al consultar Firestore para ideaId ${ideaId}:`, fsErr?.message)
+        console.warn(
+          `[Coppy-Hook Agent] Error al consultar Firestore para ideaId ${ideaId}:`,
+          fsErr?.message,
+        )
       }
     }
 
@@ -111,11 +115,14 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        message: 'Faltan parámetros obligatorios: headline y contentIdea son requeridos (o un ideaId válido).',
+        message:
+          'Faltan parámetros obligatorios: headline y contentIdea son requeridos (o un ideaId válido).',
       })
     }
 
-    console.info(`[Coppy-Hook Agent] Iniciando redacción para plataforma: "${platform}" con modelo ${AI_MODEL}`)
+    console.info(
+      `[Coppy-Hook Agent] Iniciando redacción para plataforma: "${platform}" con modelo ${AI_MODEL}`,
+    )
 
     // --- ASDD Throttling obligatorio: Pausa de 4 segundos ---
     console.info('[Coppy-Hook Agent] Aplicando Throttling ASDD (4s)...')
@@ -157,10 +164,15 @@ Redacta el copy definitivo optimizado específicamente para ${platform} siguiend
         break
       } catch (genError: any) {
         const errMsg = String(genError?.message || genError)
-        const isRateLimit = errMsg.includes('429') || errMsg.includes('RESOURCE_EXHAUSTED') || errMsg.includes('quota')
+        const isRateLimit =
+          errMsg.includes('429') ||
+          errMsg.includes('RESOURCE_EXHAUSTED') ||
+          errMsg.includes('quota')
 
         if (isRateLimit && attempts < maxAttempts) {
-          console.warn(`[Coppy-Hook Agent] Rate limit temporal en intento ${attempts}. Pausando 4s antes de reintentar...`)
+          console.warn(
+            `[Coppy-Hook Agent] Rate limit temporal en intento ${attempts}. Pausando 4s antes de reintentar...`,
+          )
           await new Promise((r) => setTimeout(r, 4000))
           continue
         }
@@ -221,9 +233,13 @@ ${parsed.cta || 'Comentá o envianos un mensaje directo para coordinar tu sesió
           copyPlatform: platform,
           updatedAt: FieldValue.serverTimestamp(),
         })
-        console.info(`[Coppy-Hook Agent] Documento Firestore ${ideaId} actualizado con el copy generado.`)
+        console.info(
+          `[Coppy-Hook Agent] Documento Firestore ${ideaId} actualizado con el copy generado.`,
+        )
       } catch (fsErr: any) {
-        console.warn(`[Coppy-Hook Agent] No se pudo persistir en Firestore (${ideaId}): ${fsErr?.message}`)
+        console.warn(
+          `[Coppy-Hook Agent] No se pudo persistir en Firestore (${ideaId}): ${fsErr?.message}`,
+        )
       }
     }
 
@@ -252,10 +268,20 @@ ${parsed.cta || 'Comentá o envianos un mensaje directo para coordinar tu sesió
     const rawMessage = String(error?.message || error || '')
     let userFriendlyMessage = rawMessage
 
-    if (rawMessage.includes('429') || rawMessage.includes('RESOURCE_EXHAUSTED') || rawMessage.includes('quota')) {
-      userFriendlyMessage = 'Límite de solicitudes de la API de Gemini alcanzado (Cuota temporal). Por favor aguardá unos segundos antes de reintentar.'
-    } else if (rawMessage.includes('API_KEY_INVALID') || rawMessage.includes('401') || rawMessage.includes('403')) {
-      userFriendlyMessage = 'Clave API de Gemini inválida o sin permisos suficientes. Verificá tu NUXT_GEMINI_API_KEY en el archivo .env.'
+    if (
+      rawMessage.includes('429') ||
+      rawMessage.includes('RESOURCE_EXHAUSTED') ||
+      rawMessage.includes('quota')
+    ) {
+      userFriendlyMessage =
+        'Límite de solicitudes de la API de Gemini alcanzado (Cuota temporal). Por favor aguardá unos segundos antes de reintentar.'
+    } else if (
+      rawMessage.includes('API_KEY_INVALID') ||
+      rawMessage.includes('401') ||
+      rawMessage.includes('403')
+    ) {
+      userFriendlyMessage =
+        'Clave API de Gemini inválida o sin permisos suficientes. Verificá tu NUXT_GEMINI_API_KEY en el archivo .env.'
     }
 
     throw createError({

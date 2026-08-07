@@ -4,18 +4,22 @@
  * Layer: widgets/latest-copy
  */
 import { Heart, MessageCircle, Send, Bookmark, FileText } from '@lucide/vue'
-import { AGENTS } from '~~/shared/constants/agents'
+import { AGENTS, SECTIONS } from '~~/shared/constants'
 </script>
 
 <template>
   <section class="flex flex-col rounded-xl border border-border bg-card">
     <header class="flex items-center gap-2 border-b border-border px-5 py-4">
-      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+      <div
+        class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-accent-foreground"
+      >
         <FileText class="h-4 w-4" />
       </div>
       <div>
-        <h2 class="text-sm font-semibold">Últimos Copys Generados</h2>
-        <p class="text-xs text-muted-foreground">Borradores ({{ AGENTS.COPPY_HOOK.name }})</p>
+        <h2 class="text-sm font-semibold">{{ SECTIONS.BORRADORES.title }}</h2>
+        <p class="text-xs text-muted-foreground">
+          {{ SECTIONS.BORRADORES.label }} ({{ AGENTS.COPPY_HOOK.name }})
+        </p>
       </div>
       <span class="ml-auto rounded-md bg-chart-5/15 px-2 py-1 text-xs font-medium text-chart-5">
         En Revisión
@@ -25,7 +29,9 @@ import { AGENTS } from '~~/shared/constants/agents'
     <div class="p-5">
       <article class="overflow-hidden rounded-xl border border-border">
         <div class="flex items-center gap-2.5 px-3 py-2.5">
-          <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+          <div
+            class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground"
+          >
             MA
           </div>
           <div class="flex flex-col leading-tight">
@@ -60,7 +66,8 @@ import { AGENTS } from '~~/shared/constants/agents'
 
         <p class="px-3 pb-4 pt-2 text-xs leading-relaxed">
           <span class="font-semibold">marketing.ai</span>
-          La IA generativa ya está redefiniendo el marketing B2B. Descubre cómo aumentar tu conversión un 40% sin ampliar tu equipo. 🚀
+          La IA generativa ya está redefiniendo el marketing B2B. Descubre cómo aumentar tu
+          conversión un 40% sin ampliar tu equipo. 🚀
           <span class="text-primary">#MarketingAI #B2B #Growth</span>
         </p>
       </article>

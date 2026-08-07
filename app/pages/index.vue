@@ -4,6 +4,7 @@
  * Layer: app/pages
  */
 import { SatelliteDishIcon, FileText, Users, CheckCircle2 } from '@lucide/vue'
+import { SECTIONS } from '~~/shared/constants'
 import {
   PendingNewsWidget,
   LatestCopyWidget,
@@ -12,9 +13,9 @@ import {
 } from '~~/widgets'
 
 const stats = [
-  { label: 'Radar de Tendencias', value: '3', icon: SatelliteDishIcon },
+  { label: SECTIONS.TENDENCIAS.title, value: '3', icon: SatelliteDishIcon },
   { label: 'Copys en revisión', value: '5', icon: FileText },
-  { label: 'Leads calificados', value: '12', icon: Users },
+  { label: SECTIONS.LEADS.title, value: '12', icon: Users },
   { label: 'Aprobados hoy', value: '8', icon: CheckCircle2 },
 ]
 </script>
@@ -34,7 +35,9 @@ const stats = [
         :key="stat.label"
         class="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-sm"
       >
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground"
+        >
           <component :is="stat.icon" class="h-5 w-5" />
         </div>
         <div class="flex flex-col">

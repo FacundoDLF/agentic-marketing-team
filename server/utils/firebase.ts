@@ -20,7 +20,7 @@ export function getFirebaseAdminApp(): App {
 
   if (!existsSync(keyPath)) {
     throw new Error(
-      `No se encontró el archivo de credenciales de Firebase en: ${keyPath}. Por favor coloca tu 'firebase-admin-key.json' en la raíz del proyecto.`
+      `No se encontró el archivo de credenciales de Firebase en: ${keyPath}. Por favor coloca tu 'firebase-admin-key.json' en la raíz del proyecto.`,
     )
   }
 
@@ -34,7 +34,9 @@ export function getFirebaseAdminApp(): App {
 
     return firebaseApp
   } catch (error: any) {
-    throw new Error(`Error al inicializar Firebase Admin SDK: ${error?.message || 'Error desconocido'}`)
+    throw new Error(
+      `Error al inicializar Firebase Admin SDK: ${error?.message || 'Error desconocido'}`,
+    )
   }
 }
 

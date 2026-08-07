@@ -12,7 +12,13 @@ export default defineEventHandler(async () => {
     const firestore = getFirestoreDb()
     const snapshot = await firestore
       .collection('news_ideas')
-      .where('status', 'in', ['pending', 'pending_review', 'approved', 'copy_generating', 'copy_ready'])
+      .where('status', 'in', [
+        'pending',
+        'pending_review',
+        'approved',
+        'copy_generating',
+        'copy_ready',
+      ])
       .get()
 
     const ideas: NewsIdea[] = []

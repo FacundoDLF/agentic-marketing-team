@@ -32,7 +32,7 @@ import {
 } from '@lucide/vue'
 import { useScraper, type ScraperTimeframe } from '~~/features/ScraperNews'
 import { agentService } from '~~/services/agentService'
-import { AGENTS } from '~~/shared/constants/agents'
+import { AGENTS, SECTIONS } from '~~/shared/constants'
 import { cn } from '~~/shared/lib/utils'
 import type { NewsIdea } from '~~/entities/news/types'
 
@@ -85,14 +85,14 @@ async function handleManualSubmit(): Promise<void> {
 }
 
 // Computed: true si al menos un item está expandido (para toggle global)
-const anyExpanded = computed(() =>
-  ideas.value.some((item) => isExpanded(item.id))
-)
+const anyExpanded = computed(() => ideas.value.some((item) => isExpanded(item.id)))
 
 function toggleAll(): void {
   const target = !anyExpanded.value
   const next: Record<string, boolean> = {}
-  ideas.value.forEach((item) => { next[item.id] = target })
+  ideas.value.forEach((item) => {
+    next[item.id] = target
+  })
   expandedItems.value = next
 }
 
@@ -196,8 +196,18 @@ function formatNewsDate(dateStr?: string): string {
 
   const day = String(d.getDate()).padStart(2, '0')
   const months = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre',
   ]
   const month = months[d.getMonth()]
   const year = d.getFullYear()
@@ -218,13 +228,13 @@ function formatNewsDate(dateStr?: string): string {
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2">
-            <h2 class="text-sm font-semibold tracking-tight text-foreground sm:text-base">Radar de Tendencias</h2>
-            <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-              <Sparkles class="h-3 w-3" /> {{ AGENTS.SCRAPY.name }} + {{ AGENTS.COPPY_HOOK.name }}
-            </span>
+            <h2 class="text-sm font-semibold tracking-tight text-foreground sm:text-base">
+              {{ SECTIONS.TENDENCIAS.title }}
+            </h2>
           </div>
           <p class="text-xs leading-snug text-muted-foreground sm:text-sm">
-            Ideas estratégicas de noticias reales. Aprobá y generá copys de alto impacto con un clic.
+            Ideas estratégicas de noticias reales. Aprobá y generá copys de alto impacto con un
+            clic.
           </p>
         </div>
       </div>
@@ -264,11 +274,13 @@ function formatNewsDate(dateStr?: string): string {
     <!-- Manual URL Ingestion Bar -->
     <div class="flex items-center gap-2 border-b border-border/60 bg-muted/20 px-5 py-2.5">
       <div class="relative flex-1">
-        <Link2 class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <Link2
+          class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
+        />
         <input
           v-model="manualUrl"
           type="url"
-          placeholder="O ingresá el link directo de una noticia para procesar (Bypass manual)..."
+          placeholder="Ingresá acá el link directo de una noticia para procesarla manualmente."
           :disabled="loading || fetchingIdeas"
           class="h-8 w-full rounded-lg border border-border bg-background pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground/60 transition-colors focus:border-primary/60 focus:outline-none focus:ring-1 focus:ring-primary/30 disabled:opacity-50"
           @keydown.enter.prevent="handleManualSubmit"
@@ -303,7 +315,8 @@ function formatNewsDate(dateStr?: string): string {
     >
       <AlertTriangle class="mt-0.5 h-4 w-4 shrink-0 text-chart-4" />
       <p class="flex-1">
-        <span class="font-semibold text-chart-4">Bandeja llena.</span> Tenés 10 ideas pendientes de revisión. Aprobá o descartá algunas para liberar espacio antes de volver a escanear.
+        <span class="font-semibold text-chart-4">Bandeja llena.</span> Tenés 10 ideas pendientes de
+        revisión. Aprobá o descartá algunas para liberar espacio antes de volver a escanear.
       </p>
     </div>
 
@@ -315,7 +328,8 @@ function formatNewsDate(dateStr?: string): string {
     >
       <Info class="mt-0.5 h-4 w-4 shrink-0 text-chart-4" />
       <p class="flex-1">
-        <span class="font-semibold text-chart-4">URL ya procesada.</span> Esta noticia ya fue analizada anteriormente. Ingresá un link nuevo.
+        <span class="font-semibold text-chart-4">URL ya procesada.</span> Esta noticia ya fue
+        analizada anteriormente. Ingresá un link nuevo.
       </p>
     </div>
 
@@ -327,15 +341,23 @@ function formatNewsDate(dateStr?: string): string {
     >
       <Info class="mt-0.5 h-4 w-4 shrink-0 text-primary/70" />
       <p class="flex-1">
-        <span class="font-semibold">Ya estás al día.</span> No hay noticias nuevas en este período. Intentá con otro filtro o volvé más tarde.
+        <span class="font-semibold">Ya estás al día.</span> No hay noticias nuevas en este período.
+        Intentá con otro filtro o volvé más tarde.
       </p>
     </div>
 
     <!-- Loading Skeleton State -->
-    <div v-if="loading || (fetchingIdeas && ideas.length === 0)" class="flex flex-col divide-y divide-border p-5">
+    <div
+      v-if="loading || (fetchingIdeas && ideas.length === 0)"
+      class="flex flex-col divide-y divide-border p-5"
+    >
       <div class="flex items-center gap-2 py-3 text-xs text-muted-foreground">
         <Loader2 class="h-4 w-4 animate-spin text-primary" />
-        <span>{{ loading ? 'Rastreando Google News Rosario y procesando con IA...' : 'Cargando ideas de Firestore...' }}</span>
+        <span>{{
+          loading
+            ? 'Rastreando Google News Rosario y procesando con IA...'
+            : 'Cargando ideas de Firestore...'
+        }}</span>
       </div>
       <div v-for="i in 3" :key="i" class="flex flex-col gap-2.5 py-4 animate-pulse">
         <div class="flex items-center gap-2">
@@ -358,18 +380,33 @@ function formatNewsDate(dateStr?: string): string {
     >
       <!-- Stepper horizontal -->
       <div class="flex flex-wrap items-center justify-center gap-1.5 text-xs font-medium sm:gap-2">
-        <div class="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-primary shadow-xs">
-          <span class="flex h-4 w-4 items-center justify-center rounded-full bg-primary/20 text-[10px] font-semibold text-primary">1</span>
+        <div
+          class="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-primary shadow-xs"
+        >
+          <span
+            class="flex h-4 w-4 items-center justify-center rounded-full bg-primary/20 text-[10px] font-semibold text-primary"
+            >1</span
+          >
           <span>Escaneo ({{ AGENTS.SCRAPY.name }})</span>
         </div>
         <span class="font-normal text-muted-foreground/40">➔</span>
-        <div class="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-muted/40 px-3 py-1 text-muted-foreground/70">
-          <span class="flex h-4 w-4 items-center justify-center rounded-full bg-muted-foreground/20 text-[10px] font-semibold text-muted-foreground">2</span>
+        <div
+          class="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-muted/40 px-3 py-1 text-muted-foreground/70"
+        >
+          <span
+            class="flex h-4 w-4 items-center justify-center rounded-full bg-muted-foreground/20 text-[10px] font-semibold text-muted-foreground"
+            >2</span
+          >
           <span>Supervisión</span>
         </div>
         <span class="font-normal text-muted-foreground/40">➔</span>
-        <div class="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-muted/40 px-3 py-1 text-muted-foreground/70">
-          <span class="flex h-4 w-4 items-center justify-center rounded-full bg-muted-foreground/20 text-[10px] font-semibold text-muted-foreground">3</span>
+        <div
+          class="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-muted/40 px-3 py-1 text-muted-foreground/70"
+        >
+          <span
+            class="flex h-4 w-4 items-center justify-center rounded-full bg-muted-foreground/20 text-[10px] font-semibold text-muted-foreground"
+            >3</span
+          >
           <span>{{ AGENTS.COPPY_HOOK.name }}</span>
         </div>
       </div>
@@ -378,7 +415,8 @@ function formatNewsDate(dateStr?: string): string {
       <div class="flex max-w-sm flex-col gap-1.5">
         <p class="text-sm font-semibold text-foreground">Radar despejado</p>
         <p class="text-xs leading-relaxed text-muted-foreground">
-          Escaneá las últimas tendencias para descubrir nuevas oportunidades de contenido y convertirlas en publicaciones.
+          Escaneá las últimas tendencias para descubrir nuevas oportunidades de contenido y
+          convertirlas en publicaciones.
         </p>
       </div>
 
@@ -417,14 +455,16 @@ function formatNewsDate(dateStr?: string): string {
         <li
           v-for="item in ideas"
           :key="item.id"
-          :class="cn(
-            'flex flex-col gap-0 transition-colors',
-            item.status === 'copy_ready'
-              ? 'border-l-3 border-l-primary bg-primary/5 hover:bg-primary/8'
-              : item.status === 'approved'
-                ? 'border-l-3 border-l-success bg-success/5 hover:bg-success/10'
-                : 'hover:bg-muted/10'
-          )"
+          :class="
+            cn(
+              'flex flex-col gap-0 transition-colors',
+              item.status === 'copy_ready'
+                ? 'border-l-3 border-l-primary bg-primary/5 hover:bg-primary/8'
+                : item.status === 'approved'
+                  ? 'border-l-3 border-l-success bg-success/5 hover:bg-success/10'
+                  : 'hover:bg-muted/10',
+            )
+          "
         >
           <!-- Row header with toggle -->
           <button
@@ -481,9 +521,16 @@ function formatNewsDate(dateStr?: string): string {
             </div>
             <!-- Chevron icon -->
             <svg
-              :class="['mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/60 transition-transform duration-200', isExpanded(item.id) ? 'rotate-180' : 'rotate-0']"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round"
+              :class="[
+                'mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/60 transition-transform duration-200',
+                isExpanded(item.id) ? 'rotate-180' : 'rotate-0',
+              ]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -509,7 +556,9 @@ function formatNewsDate(dateStr?: string): string {
 
             <!-- Content Idea (Rendered Markdown de Idea Cruda) -->
             <div class="flex flex-col gap-1.5">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <span
+                class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground"
+              >
                 Idea Estratégica ({{ AGENTS.SCRAPY.name }})
               </span>
               <div
@@ -522,7 +571,10 @@ function formatNewsDate(dateStr?: string): string {
             <!-- UI DINÁMICA POR ESTADO -->
 
             <!-- Estado: pending_review (Botones Aprobar y Descartar) -->
-            <div v-if="item.status === 'pending_review' || item.status === 'pending'" class="flex items-center gap-2 pt-1">
+            <div
+              v-if="item.status === 'pending_review' || item.status === 'pending'"
+              class="flex items-center gap-2 pt-1"
+            >
               <button
                 type="button"
                 class="inline-flex items-center gap-1.5 rounded-lg bg-success px-3.5 py-1.5 text-xs font-medium text-success-foreground shadow-xs transition-all hover:bg-success/90 hover:shadow"
@@ -542,12 +594,23 @@ function formatNewsDate(dateStr?: string): string {
             </div>
 
             <!-- Estado: approved o copy_ready (Sección Coppy-Hook Agent) -->
-            <div v-else-if="item.status === 'approved' || item.status === 'copy_ready' || item.status === 'copy_generating'" class="flex flex-col gap-3 rounded-xl border border-border/80 bg-background/70 p-4 shadow-xs">
-              
+            <div
+              v-else-if="
+                item.status === 'approved' ||
+                item.status === 'copy_ready' ||
+                item.status === 'copy_generating'
+              "
+              class="flex flex-col gap-3 rounded-xl border border-border/80 bg-background/70 p-4 shadow-xs"
+            >
               <!-- Control Bar: Platform Selector + Generate Button + Archive -->
-              <div class="flex flex-wrap items-center justify-between gap-2.5 border-b border-border/60 pb-3">
+              <div
+                class="flex flex-wrap items-center justify-between gap-2.5 border-b border-border/60 pb-3"
+              >
                 <div class="flex flex-wrap items-center gap-2">
-                  <label :for="`platform-${item.id}`" class="text-xs font-medium text-muted-foreground">
+                  <label
+                    :for="`platform-${item.id}`"
+                    class="text-xs font-medium text-muted-foreground"
+                  >
                     Plataforma:
                   </label>
                   <select
@@ -555,7 +618,9 @@ function formatNewsDate(dateStr?: string): string {
                     :value="getSelectedPlatform(item)"
                     :disabled="generatingCopy[item.id]"
                     class="h-7 rounded-md border border-border bg-muted/50 px-2.5 text-xs font-medium text-foreground transition-colors hover:bg-muted focus:outline-none focus:ring-1 focus:ring-primary/40 disabled:opacity-50"
-                    @change="setSelectedPlatform(item.id, ($event.target as HTMLSelectElement).value)"
+                    @change="
+                      setSelectedPlatform(item.id, ($event.target as HTMLSelectElement).value)
+                    "
                   >
                     <option v-for="p in platformOptions" :key="p" :value="p">
                       {{ p }}
@@ -574,7 +639,13 @@ function formatNewsDate(dateStr?: string): string {
                     <Loader2 v-if="generatingCopy[item.id]" class="h-3.5 w-3.5 animate-spin" />
                     <Wand2 v-else class="h-3.5 w-3.5 text-primary-foreground" />
                     <span>
-                      {{ generatingCopy[item.id] ? `Redactando Copy (${AGENTS.COPPY_HOOK.name})...` : (item.copyFormatted ? 'Regenerar Copy' : `Generar Copy con ${AGENTS.COPPY_HOOK.name}`) }}
+                      {{
+                        generatingCopy[item.id]
+                          ? `Redactando Copy (${AGENTS.COPPY_HOOK.name})...`
+                          : item.copyFormatted
+                            ? 'Regenerar Copy'
+                            : `Generar Copy con ${AGENTS.COPPY_HOOK.name}`
+                      }}
                     </span>
                   </button>
 
@@ -591,38 +662,59 @@ function formatNewsDate(dateStr?: string): string {
               </div>
 
               <!-- Error al generar copy -->
-              <div v-if="copyError[item.id]" class="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive">
+              <div
+                v-if="copyError[item.id]"
+                class="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-2.5 text-xs text-destructive"
+              >
                 <AlertCircle class="h-4 w-4 shrink-0" />
                 <span class="flex-1">{{ copyError[item.id] }}</span>
               </div>
 
               <!-- Copy Generation Loading Spinner -->
-              <div v-if="generatingCopy[item.id]" class="flex items-center justify-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-6 text-xs text-primary">
+              <div
+                v-if="generatingCopy[item.id]"
+                class="flex items-center justify-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-6 text-xs text-primary"
+              >
                 <Loader2 class="h-5 w-5 animate-spin" />
                 <div class="flex flex-col gap-0.5">
-                  <span class="font-semibold">{{ AGENTS.COPPY_HOOK.name }} está creando el guión...</span>
-                  <span class="text-[11px] text-muted-foreground">Aplicando estructura de gancho magnético, caption y hashtags para Rosario.</span>
+                  <span class="font-semibold"
+                    >{{ AGENTS.COPPY_HOOK.name }} está creando el guión...</span
+                  >
+                  <span class="text-[11px] text-muted-foreground"
+                    >Aplicando estructura de gancho magnético, caption y hashtags para
+                    Rosario.</span
+                  >
                 </div>
               </div>
 
               <!-- RENDERIZADO ESTRUCTURADO DEL COPY (SECCIONES CON ONE-CLICK COPY) -->
               <div v-else-if="item.copySections" class="flex flex-col gap-2.5 pt-1">
-                
                 <!-- 1. ⚓ Hook (3s) -->
-                <div class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40">
+                <div
+                  class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40"
+                >
                   <div class="mb-1.5 flex items-center justify-between">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                    <span
+                      class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground"
+                    >
                       <span>⚓ Hook (3s)</span>
-                      <span class="text-[10px] font-normal text-muted-foreground">Freno de scroll</span>
+                      <span class="text-[10px] font-normal text-muted-foreground"
+                        >Freno de scroll</span
+                      >
                     </span>
                     <button
                       type="button"
                       class="inline-flex items-center gap-1 rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground transition-all hover:bg-muted active:scale-95"
                       @click="copyToClipboard(item.copySections.hook, `hook-${item.id}`)"
                     >
-                      <CheckCheck v-if="copiedKeys[`hook-${item.id}`]" class="h-3 w-3 text-success" />
+                      <CheckCheck
+                        v-if="copiedKeys[`hook-${item.id}`]"
+                        class="h-3 w-3 text-success"
+                      />
                       <Copy v-else class="h-3 w-3 text-muted-foreground" />
-                      <span :class="copiedKeys[`hook-${item.id}`] ? 'text-success font-semibold' : ''">
+                      <span
+                        :class="copiedKeys[`hook-${item.id}`] ? 'text-success font-semibold' : ''"
+                      >
                         {{ copiedKeys[`hook-${item.id}`] ? '¡Copiado!' : 'Copiar' }}
                       </span>
                     </button>
@@ -633,20 +725,31 @@ function formatNewsDate(dateStr?: string): string {
                 </div>
 
                 <!-- 2. 📝 Cuerpo / Guión -->
-                <div class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40">
+                <div
+                  class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40"
+                >
                   <div class="mb-1.5 flex items-center justify-between">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                    <span
+                      class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground"
+                    >
                       <span>📝 Cuerpo / Guión</span>
-                      <span class="text-[10px] font-normal text-muted-foreground">Contenido principal</span>
+                      <span class="text-[10px] font-normal text-muted-foreground"
+                        >Contenido principal</span
+                      >
                     </span>
                     <button
                       type="button"
                       class="inline-flex items-center gap-1 rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground transition-all hover:bg-muted active:scale-95"
                       @click="copyToClipboard(item.copySections.body, `body-${item.id}`)"
                     >
-                      <CheckCheck v-if="copiedKeys[`body-${item.id}`]" class="h-3 w-3 text-success" />
+                      <CheckCheck
+                        v-if="copiedKeys[`body-${item.id}`]"
+                        class="h-3 w-3 text-success"
+                      />
                       <Copy v-else class="h-3 w-3 text-muted-foreground" />
-                      <span :class="copiedKeys[`body-${item.id}`] ? 'text-success font-semibold' : ''">
+                      <span
+                        :class="copiedKeys[`body-${item.id}`] ? 'text-success font-semibold' : ''"
+                      >
                         {{ copiedKeys[`body-${item.id}`] ? '¡Copiado!' : 'Copiar' }}
                       </span>
                     </button>
@@ -657,20 +760,33 @@ function formatNewsDate(dateStr?: string): string {
                 </div>
 
                 <!-- 3. 💬 Caption -->
-                <div class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40">
+                <div
+                  class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40"
+                >
                   <div class="mb-1.5 flex items-center justify-between">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                    <span
+                      class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground"
+                    >
                       <span>💬 Caption</span>
-                      <span class="text-[10px] font-normal text-muted-foreground">Descripción del post</span>
+                      <span class="text-[10px] font-normal text-muted-foreground"
+                        >Descripción del post</span
+                      >
                     </span>
                     <button
                       type="button"
                       class="inline-flex items-center gap-1 rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground transition-all hover:bg-muted active:scale-95"
                       @click="copyToClipboard(item.copySections.caption, `caption-${item.id}`)"
                     >
-                      <CheckCheck v-if="copiedKeys[`caption-${item.id}`]" class="h-3 w-3 text-success" />
+                      <CheckCheck
+                        v-if="copiedKeys[`caption-${item.id}`]"
+                        class="h-3 w-3 text-success"
+                      />
                       <Copy v-else class="h-3 w-3 text-muted-foreground" />
-                      <span :class="copiedKeys[`caption-${item.id}`] ? 'text-success font-semibold' : ''">
+                      <span
+                        :class="
+                          copiedKeys[`caption-${item.id}`] ? 'text-success font-semibold' : ''
+                        "
+                      >
                         {{ copiedKeys[`caption-${item.id}`] ? '¡Copiado!' : 'Copiar' }}
                       </span>
                     </button>
@@ -681,20 +797,35 @@ function formatNewsDate(dateStr?: string): string {
                 </div>
 
                 <!-- 4. #️⃣ Hashtags -->
-                <div class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40">
+                <div
+                  class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40"
+                >
                   <div class="mb-1.5 flex items-center justify-between">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                    <span
+                      class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground"
+                    >
                       <span>#️⃣ Hashtags</span>
-                      <span class="text-[10px] font-normal text-muted-foreground">Tags optimizados</span>
+                      <span class="text-[10px] font-normal text-muted-foreground"
+                        >Tags optimizados</span
+                      >
                     </span>
                     <button
                       type="button"
                       class="inline-flex items-center gap-1 rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground transition-all hover:bg-muted active:scale-95"
-                      @click="copyToClipboard(item.copySections.hashtags.join(' '), `hashtags-${item.id}`)"
+                      @click="
+                        copyToClipboard(item.copySections.hashtags.join(' '), `hashtags-${item.id}`)
+                      "
                     >
-                      <CheckCheck v-if="copiedKeys[`hashtags-${item.id}`]" class="h-3 w-3 text-success" />
+                      <CheckCheck
+                        v-if="copiedKeys[`hashtags-${item.id}`]"
+                        class="h-3 w-3 text-success"
+                      />
                       <Copy v-else class="h-3 w-3 text-muted-foreground" />
-                      <span :class="copiedKeys[`hashtags-${item.id}`] ? 'text-success font-semibold' : ''">
+                      <span
+                        :class="
+                          copiedKeys[`hashtags-${item.id}`] ? 'text-success font-semibold' : ''
+                        "
+                      >
                         {{ copiedKeys[`hashtags-${item.id}`] ? '¡Copiado!' : 'Copiar' }}
                       </span>
                     </button>
@@ -711,20 +842,31 @@ function formatNewsDate(dateStr?: string): string {
                 </div>
 
                 <!-- 5. 🎯 CTA -->
-                <div class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40">
+                <div
+                  class="group relative rounded-lg border border-border/70 bg-card p-3 shadow-2xs transition-all hover:border-primary/40"
+                >
                   <div class="mb-1.5 flex items-center justify-between">
-                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                    <span
+                      class="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground"
+                    >
                       <span>🎯 CTA</span>
-                      <span class="text-[10px] font-normal text-muted-foreground">Llamado a la acción</span>
+                      <span class="text-[10px] font-normal text-muted-foreground"
+                        >Llamado a la acción</span
+                      >
                     </span>
                     <button
                       type="button"
                       class="inline-flex items-center gap-1 rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground transition-all hover:bg-muted active:scale-95"
                       @click="copyToClipboard(item.copySections.cta, `cta-${item.id}`)"
                     >
-                      <CheckCheck v-if="copiedKeys[`cta-${item.id}`]" class="h-3 w-3 text-success" />
+                      <CheckCheck
+                        v-if="copiedKeys[`cta-${item.id}`]"
+                        class="h-3 w-3 text-success"
+                      />
                       <Copy v-else class="h-3 w-3 text-muted-foreground" />
-                      <span :class="copiedKeys[`cta-${item.id}`] ? 'text-success font-semibold' : ''">
+                      <span
+                        :class="copiedKeys[`cta-${item.id}`] ? 'text-success font-semibold' : ''"
+                      >
                         {{ copiedKeys[`cta-${item.id}`] ? '¡Copiado!' : 'Copiar' }}
                       </span>
                     </button>
@@ -741,10 +883,17 @@ function formatNewsDate(dateStr?: string): string {
                     class="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-medium text-primary shadow-2xs transition-all hover:bg-primary/20 active:scale-98"
                     @click="copyToClipboard(item.copyFormatted || '', `all-${item.id}`)"
                   >
-                    <CheckCheck v-if="copiedKeys[`all-${item.id}`]" class="h-3.5 w-3.5 text-success" />
+                    <CheckCheck
+                      v-if="copiedKeys[`all-${item.id}`]"
+                      class="h-3.5 w-3.5 text-success"
+                    />
                     <Copy v-else class="h-3.5 w-3.5" />
                     <span :class="copiedKeys[`all-${item.id}`] ? 'text-success font-semibold' : ''">
-                      {{ copiedKeys[`all-${item.id}`] ? '¡Todo el Copy Copiado!' : 'Copiar Copy Completo' }}
+                      {{
+                        copiedKeys[`all-${item.id}`]
+                          ? '¡Todo el Copy Copiado!'
+                          : 'Copiar Copy Completo'
+                      }}
                     </span>
                   </button>
                 </div>
@@ -762,7 +911,10 @@ function formatNewsDate(dateStr?: string): string {
                     class="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/20"
                     @click="copyToClipboard(item.copyFormatted, `all-${item.id}`)"
                   >
-                    <CheckCheck v-if="copiedKeys[`all-${item.id}`]" class="h-3.5 w-3.5 text-success" />
+                    <CheckCheck
+                      v-if="copiedKeys[`all-${item.id}`]"
+                      class="h-3.5 w-3.5 text-success"
+                    />
                     <Copy v-else class="h-3.5 w-3.5" />
                     <span>{{ copiedKeys[`all-${item.id}`] ? '¡Copiado!' : 'Copiar Todo' }}</span>
                   </button>
@@ -770,7 +922,10 @@ function formatNewsDate(dateStr?: string): string {
               </div>
 
               <!-- Mensaje inicial de aprobado sin copy generado aún -->
-              <div v-else class="flex items-center justify-between rounded-lg border border-dashed border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground">
+              <div
+                v-else
+                class="flex items-center justify-between rounded-lg border border-dashed border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground"
+              >
                 <span class="inline-flex items-center gap-1.5">
                   <Check class="h-3.5 w-3.5 text-success" />
                   Idea aprobada. Seleccioná la plataforma y clickeá en "Generar Copy".

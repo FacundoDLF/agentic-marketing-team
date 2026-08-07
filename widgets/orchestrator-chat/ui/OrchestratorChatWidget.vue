@@ -1,11 +1,11 @@
 <script setup lang="ts">
 /**
- * OrchestratorChatWidget — Orchestrator agent (Agent 4) interactive chat.
- *
- * FSD Layer: widgets/orchestrator-chat
+ * OrchestratorChatWidget: Orchestrator agent interactive chat.
+ * Layer: widgets/orchestrator-chat
  */
 import { ref } from 'vue'
 import { Bot, ArrowUp } from '@lucide/vue'
+import { SECTIONS } from '~~/shared/constants'
 
 interface ChatMessage {
   role: 'assistant' | 'user'
@@ -21,7 +21,7 @@ const suggestions = [
 const messages = ref<ChatMessage[]>([
   {
     role: 'assistant',
-    text: 'Hola 👋 Soy el Orquestador (Agente 4). Coordino a todo el equipo por ti. ¿Qué necesitas hacer hoy?',
+    text: `Hola 👋 Soy el ${SECTIONS.ORQUESTADOR.title} (${SECTIONS.ORQUESTADOR.agent}). Coordino a todo el equipo por ti. ¿Qué necesitas hacer hoy?`,
   },
 ])
 
@@ -34,7 +34,6 @@ function send(text: string): void {
   messages.value.push({ role: 'user', text: value })
   input.value = ''
 
-  // Mock assistant response
   setTimeout(() => {
     messages.value.push({
       role: 'assistant',
@@ -60,20 +59,15 @@ function handleKeyDown(e: KeyboardEvent): void {
         <Bot class="h-4 w-4" />
       </div>
       <div>
-        <h2 class="text-sm font-semibold">Orquestador Chat</h2>
-        <p class="text-xs text-muted-foreground">
-          Coordina a todos los agentes
-        </p>
+        <h2 class="text-sm font-semibold">{{ SECTIONS.ORQUESTADOR.title }}</h2>
+        <p class="text-xs text-muted-foreground">{{ SECTIONS.ORQUESTADOR.description }}</p>
       </div>
-      <span
-        class="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground"
-      >
+      <span class="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
         <span class="h-2 w-2 rounded-full bg-success" />
         Activo
       </span>
     </header>
 
-    <!-- Chat Message List -->
     <div class="flex flex-1 flex-col gap-3 overflow-y-auto px-5 py-4">
       <div
         v-for="(m, i) in messages"
@@ -88,7 +82,6 @@ function handleKeyDown(e: KeyboardEvent): void {
       </div>
     </div>
 
-    <!-- Quick Suggestions -->
     <div class="flex flex-wrap gap-2 px-5 pb-3">
       <button
         v-for="s in suggestions"
@@ -101,7 +94,6 @@ function handleKeyDown(e: KeyboardEvent): void {
       </button>
     </div>
 
-    <!-- Message Input -->
     <div class="border-t border-border p-3">
       <div
         class="flex items-center gap-2 rounded-xl border border-input bg-background px-3 py-2 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/30"

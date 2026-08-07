@@ -10,7 +10,8 @@
 
 ### Fuentes de Verdad Centralizadas del Proyecto:
 - **Metadatos y Modelos de Agentes**: `shared/constants/agents.ts` (`AGENTS`).
-- **Navegación, Rutas y Títulos**: `shared/config/navigation.ts` (`navItems`, `tabMeta`).
+- **Secciones, Tabs y Títulos de la UI**: `shared/constants/sections.ts` (`SECTIONS`).
+- **Navegación y Rutas**: `shared/config/navigation.ts` (`navItems`, `tabMeta`, `resolveTabId`).
 - **Esquemas y Tipos de Datos (Zod + TS)**: `entities/*/types.ts`.
 - **Capa de Comunicación con Agentes**: `services/agentService.ts`.
 
