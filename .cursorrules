@@ -8,6 +8,7 @@ Queda estrictamente prohibido duplicar strings mágicos, configuraciones, metada
 - **Navegación y Rutas**: Centralizadas en `shared/config/navigation.ts` (`navItems`, `settingsEntry`, `tabMeta`).
 - **Esquemas y Tipos de Datos**: Centralizados en `entities/*/types.ts`.
 - **Servicios de API / Agentes**: Centralizados en `services/agentService.ts`.
+- **Manifiesto y Perfiles de Agentes**: Documentados formalmente en `docs/AGENT_MANIFEST.md`.
 
 ## 2. Gobernanza de Modelos de IA (Right-Sizing Matrix)
 Todo nuevo Agente o Feature de IA en `server/api/agents/` debe exportar su modelo explícitamente desde la fuente única `AGENTS`:

@@ -1,4 +1,5 @@
 export * from './pending-news'
+export * from './newsroom'
 export * from './latest-copy'
 export * from './qualified-leads'
 export * from './orchestrator-chat'

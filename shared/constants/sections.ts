@@ -31,7 +31,7 @@ export const SECTIONS = {
     title: 'Últimos Copys Generados',
     pageTitle: `Newsroom — ${AGENTS.COPPY_HOOK.name}`,
     description: 'Genera y edita copys para redes sociales, listos para tu revisión y aprobación.',
-    route: '/borradores',
+    route: '/newsroom',
     iconName: 'FileText',
     agent: AGENTS.COPPY_HOOK.name,
   },
