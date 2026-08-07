@@ -1,66 +1,22 @@
 <script setup lang="ts">
-/**
- * Dashboard Page: Main overview of the autonomous marketing team.
- * Layer: app/pages
- */
-import { SatelliteDishIcon, FileText, Users, CheckCircle2 } from '@lucide/vue'
+import { LayoutDashboard } from '@lucide/vue'
 import { SECTIONS } from '~~/shared/constants'
-import {
-  PendingNewsWidget,
-  LatestCopyWidget,
-  QualifiedLeadsWidget,
-  OrchestratorChatWidget,
-} from '~~/widgets'
-
-const stats = [
-  { label: SECTIONS.TENDENCIAS.title, value: '3', icon: SatelliteDishIcon },
-  { label: 'Copys en revisión', value: '5', icon: FileText },
-  { label: SECTIONS.LEADS.title, value: '12', icon: Users },
-  { label: 'Aprobados hoy', value: '8', icon: CheckCircle2 },
-]
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
-    <div>
-      <h2 class="text-xl font-semibold tracking-tight">Buenos días, Juan</h2>
-      <p class="text-sm text-muted-foreground">
-        Tu equipo de IA tiene acciones esperando tu aprobación.
-      </p>
+  <div
+    class="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border bg-card p-16 text-center"
+  >
+    <div
+      class="flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-accent-foreground shadow-xs"
+    >
+      <LayoutDashboard class="h-6 w-6 text-primary" />
     </div>
-
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-      <div
-        v-for="stat in stats"
-        :key="stat.label"
-        class="flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-shadow hover:shadow-sm"
-      >
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground"
-        >
-          <component :is="stat.icon" class="h-5 w-5" />
-        </div>
-        <div class="flex flex-col">
-          <span class="text-2xl font-semibold tabular-nums">
-            {{ stat.value }}
-          </span>
-          <span class="text-xs text-muted-foreground">{{ stat.label }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
-      <div class="flex flex-col gap-6 xl:col-span-2">
-        <PendingNewsWidget />
-        <QualifiedLeadsWidget />
-      </div>
-
-      <div class="flex flex-col gap-6">
-        <LatestCopyWidget />
-        <div class="h-[480px]">
-          <OrchestratorChatWidget />
-        </div>
-      </div>
-    </div>
+    <h2 class="text-lg font-semibold text-foreground">
+      Dashboard: Métricas y Estadísticas Generales (Próximamente)
+    </h2>
+    <p class="max-w-md text-sm text-muted-foreground">
+      {{ SECTIONS.DASHBOARD.description }}
+    </p>
   </div>
 </template>

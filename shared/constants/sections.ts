@@ -21,7 +21,7 @@ export const SECTIONS = {
     pageTitle: `Radar de Tendencias — ${AGENTS.SCRAPY.name}`,
     description:
       'Rastrea fuentes de noticias y detecta tendencias relevantes para tu marca automáticamente.',
-    route: '/scraper',
+    route: '/tendencias',
     iconName: 'SatelliteDishIcon',
     agent: AGENTS.SCRAPY.name,
   },
