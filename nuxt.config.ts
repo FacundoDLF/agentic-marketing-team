@@ -3,7 +3,22 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxtjs/tailwindcss', '@vueuse/nuxt'],
+
+  app: {
+    head: {
+      title: 'Marketing AI',
+      htmlAttrs: {
+        lang: 'es',
+      },
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+      ],
+      meta: [
+        { name: 'description', content: 'Marketing AI — Autonomous Team' },
+      ],
+    },
+  },
 
   runtimeConfig: {
     geminiApiKey: process.env.NUXT_GEMINI_API_KEY || '',

@@ -13,6 +13,8 @@
   "dependencies": {
     "@google/genai": "^2.16.0",
     "@lucide/vue": "^1.29.0",
+    "@vueuse/core": "^14.4.0",
+    "@vueuse/nuxt": "^14.4.0",
     "clsx": "^2.1.1",
     "firebase-admin": "^14.2.0",
     "marked": "^18.0.9",
