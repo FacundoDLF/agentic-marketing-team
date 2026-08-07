@@ -1,0 +1,24 @@
+# ASDD (Agentic Software-Driven Development) — Directivas del Repositorio
+
+## 1. Principio SSOT (Single Source of Truth) — Obligatorio y Permanente
+Queda estrictamente prohibido duplicar strings mágicos, configuraciones, metadatos de agentes, endpoints o estructuras de datos en múltiples archivos. Cada entidad, constante o regla de negocio debe tener una única fuente de verdad centralizada (en archivos de constantes, utils o tipos compartidos). El IDE tiene la obligación proactiva de identificar duplicaciones o valores hardcodeados durante cualquier refactorización o creación de código, y extraerlos automáticamente hacia su fuente centralizada correspondiente.
+
+- **Constantes de Agentes**: Centralizadas en `shared/constants/agents.ts` (`AGENTS`).
+- **Navegación y Rutas**: Centralizadas en `shared/config/navigation.ts`.
+- **Esquemas y Tipos de Datos**: Centralizados en `entities/*/types.ts`.
+- **Servicios de API / Agentes**: Centralizados en `services/agentService.ts`.
+
+## 2. Gobernanza de Modelos de IA (Right-Sizing Matrix)
+Todo nuevo Agente o Feature de IA en `server/api/agents/` debe exportar su modelo explícitamente desde la fuente única `AGENTS`:
+- **Tier 1 (Volumen / Ideación / Scraper)**: `gemini-3.5-flash-lite` (Scrapy Agent).
+- **Tier 2 (Copywriting Creativo / Hooks / Guiones)**: `gemini-3.5-flash-lite` / `gemini-2.5-pro` (Coppy-Hook Agent).
+- **Tier 3 (Supervisión & QA)**: `gemini-3.5-flash`.
+
+## 3. Throttling y Control de Tasa (Rate Limiting)
+- Procesamiento secuencial mediante bucles `for...of` o `for` en tareas por lotes.
+- Pausa obligatoria de 4000ms (`await new Promise(r => setTimeout(r, 4000))`) entre llamadas sucesivas a Gemini para respetar cuotas de API.
+
+## 4. Estándares TypeScript & Vue
+- Strict TypeScript activo: usar guardas de tipo explícitas (`if (!item) continue;`) para evitar errores por `noUncheckedIndexedAccess`.
+- Componentes modulares bajo arquitectura Feature-Sliced Design (FSD).
+- Toda refactorización debe ejecutarse y validarse con `npm test`.
