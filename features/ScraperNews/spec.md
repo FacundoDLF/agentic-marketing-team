@@ -8,11 +8,11 @@ Agente autónomo encargado de escanear la web diariamente en busca de noticias r
 - **Manual:** Botón "Forzar Escaneo" desde el Dashboard (UI).
 
 ## 3. Inputs (Entradas)
-- Herramienta de Búsqueda Web (Brave Search MCP / Tavily).
-- Variables de Configuración (guardadas en Firestore `settings`):
-  - `industry_keywords`: (Ej. "tecnología, marketing, startups")
-  - `negative_keywords`: (Ej. "política, sucesos, deportes")
-  - `target_audience_profile`: Perfil del cliente ideal.
+- Herramienta de Búsqueda Web / Feed RSS de Noticias (Google News RSS).
+- Variables de Configuración (guardadas en Firestore `settings` o config por defecto):
+  - `industry_keywords`: "bienestar corporativo, kinesiología deportiva, recuperación muscular, masajes en eventos, pausas activas, salud ocupacional, fisiatría"
+  - `negative_keywords`: "policiales, política, escándalo, denuncias, accidentes, esoterismo, misticismo, software, IT"
+  - `target_audience_profile`: "Gerentes de RRHH buscando beneficios para empleados, productoras de eventos, clínicas, gimnasios y particulares estresados o deportistas buscando recuperación en la región de Rosario, Argentina."
 
 ## 4. Flujo de Ejecución (Pipeline)
 1. **Extracción:** Usa la herramienta de búsqueda para obtener las 15 noticias más relevantes de las últimas 24 horas usando las `industry_keywords`.

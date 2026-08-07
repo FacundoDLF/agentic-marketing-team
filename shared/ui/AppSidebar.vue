@@ -10,6 +10,7 @@
 import {
   LayoutDashboard,
   Newspaper,
+  SatelliteDishIcon,
   FileText,
   Users,
   Bot,
@@ -27,6 +28,7 @@ const route = useRoute()
 const iconMap: Record<string, Component> = {
   LayoutDashboard,
   Newspaper,
+  SatelliteDishIcon,
   FileText,
   Users,
   Bot,

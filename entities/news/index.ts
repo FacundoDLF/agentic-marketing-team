@@ -1,3 +1,3 @@
 export * from './types'
 export * from './model/types'
-export * from './model/mock-data'
+// mock-data intentionally not exported: UI must use real data from Firestore via useScraper

@@ -10,6 +10,7 @@ export const NewsIdeaSchema = z.object({
   headline: z.string().min(1, { message: 'Headline is required' }),
   contentIdea: z.string().min(1, { message: 'Content idea in markdown is required' }),
   platforms: z.array(z.string()).min(1, { message: 'At least one platform is required' }),
+  publishedAt: z.string().optional(),
   status: z.string().default('pending_review'),
   createdAt: z.union([z.string(), z.number(), z.date()]),
 })

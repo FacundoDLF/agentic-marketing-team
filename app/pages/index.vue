@@ -8,7 +8,7 @@
  * 3. QualifiedLeadsWidget (Agent 3 - Leads)
  * 4. OrchestratorChatWidget (Agent 4 - Orquestador)
  */
-import { Newspaper, FileText, Users, CheckCircle2 } from '@lucide/vue'
+import { SatelliteDishIcon, FileText, Users, CheckCircle2 } from '@lucide/vue'
 import {
   PendingNewsWidget,
   LatestCopyWidget,
@@ -17,7 +17,7 @@ import {
 } from '~~/widgets'
 
 const stats = [
-  { label: 'Noticias pendientes', value: '3', icon: Newspaper },
+  { label: 'Radar de Tendencias', value: '3', icon: SatelliteDishIcon },
   { label: 'Copys en revisión', value: '5', icon: FileText },
   { label: 'Leads calificados', value: '12', icon: Users },
   { label: 'Aprobados hoy', value: '8', icon: CheckCircle2 },

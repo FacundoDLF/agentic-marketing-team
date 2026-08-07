@@ -32,7 +32,7 @@ export interface TabMeta {
 // ─── Navigation Items ───────────────────────────────────────────────
 export const navItems: NavEntry[] = [
   { id: 'dashboard', label: 'Dashboard', iconName: 'LayoutDashboard', route: '/' },
-  { id: 'scraper', label: 'Scraper', agent: 'Agente 1', iconName: 'Newspaper', route: '/scraper' },
+  { id: 'scraper', label: 'Tendencias', agent: 'Scrapy Agent', iconName: 'SatelliteDishIcon', route: '/scraper' },
   { id: 'borradores', label: 'Borradores', agent: 'Agente 2', iconName: 'FileText', route: '/borradores' },
   { id: 'leads', label: 'Leads', agent: 'Agente 3', iconName: 'Users', route: '/leads' },
   { id: 'orquestador', label: 'Orquestador', agent: 'Agente 4', iconName: 'Bot', route: '/orquestador' },
@@ -50,7 +50,7 @@ export const settingsEntry: NavEntry = {
 // ─── Page Metadata ──────────────────────────────────────────────────
 export const tabMeta: Record<TabId, TabMeta> = {
   dashboard: { title: 'Dashboard' },
-  scraper: { title: 'Scraper — Agente 1' },
+  scraper: { title: 'Radar de Tendencias — Scrapy Agent' },
   borradores: { title: 'Borradores — Agente 2' },
   leads: { title: 'Leads — Agente 3' },
   orquestador: { title: 'Orquestador — Agente 4' },
