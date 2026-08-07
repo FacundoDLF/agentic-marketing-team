@@ -1,10 +1,11 @@
 <script setup lang="ts">
 /**
- * LatestCopyWidget — Borradores agent (Agent 2) latest social copy mockup.
+ * LatestCopyWidget — Borradores agent (Coppy-Hook Agent) latest social copy mockup.
  *
  * FSD Layer: widgets/latest-copy
  */
 import { Heart, MessageCircle, Send, Bookmark, FileText } from '@lucide/vue'
+import { AGENTS } from '~~/shared/constants/agents'
 </script>
 
 <template>
@@ -17,7 +18,7 @@ import { Heart, MessageCircle, Send, Bookmark, FileText } from '@lucide/vue'
       </div>
       <div>
         <h2 class="text-sm font-semibold">Últimos Copys Generados</h2>
-        <p class="text-xs text-muted-foreground">Borradores (Agente 2)</p>
+        <p class="text-xs text-muted-foreground">Borradores ({{ AGENTS.COPPY_HOOK.name }})</p>
       </div>
       <span
         class="ml-auto rounded-md bg-chart-5/15 px-2 py-1 text-xs font-medium text-chart-5"

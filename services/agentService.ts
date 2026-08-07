@@ -25,7 +25,7 @@ export interface GenerateCopyResponse {
 
 export const agentService = {
   /**
-   * Coppy-Hook Agent (Agent 2): Generates high-impact social copy from an idea.
+   * Coppy-Hook Agent: Generates high-impact social copy from an idea.
    * @param ideaId Document ID of the idea in Firestore
    * @param platform Target social media platform
    * @param extra Optional extra payload fields if available in memory

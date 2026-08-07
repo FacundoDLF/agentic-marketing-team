@@ -3,9 +3,9 @@
  * PendingNewsWidget — Radar de Tendencias & Coppy-Hook Agent UI.
  *
  * Implements:
- * 1. Radar de Tendencias (Scrapy Agent - Agent 1) with inbox quota & deduplication.
+ * 1. Radar de Tendencias (Scrapy Agent) with inbox quota & deduplication.
  * 2. Multi-state lifecycle ('pending_review', 'approved', 'copy_generating', 'copy_ready', 'archived').
- * 3. Platform selector & Coppy-Hook Agent (Agent 2) trigger.
+ * 3. Platform selector & Coppy-Hook Agent trigger.
  * 4. Structured copy breakdown (Hook, Cuerpo/Guión, Caption, Hashtags, CTA) with One-Click Copy buttons.
  *
  * FSD Layer: widgets/pending-news

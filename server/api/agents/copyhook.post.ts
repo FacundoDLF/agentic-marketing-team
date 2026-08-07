@@ -5,7 +5,7 @@ import { AGENTS } from '../../../shared/constants/agents'
 
 /**
  * ASDD AI Model Governance Declaration
- * Agent: Coppy-Hook Agent (Agent 2 - Creative Copywriter & Scriptwriter)
+ * Agent: Coppy-Hook Agent (Creative Copywriter & Scriptwriter)
  * Cognitive Complexity: Low-Medium / High-Volume Copywriting & Scripting
  * Right-Sized Model Tier: Lite (gemini-3.5-flash-lite)
  */

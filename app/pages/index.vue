@@ -3,8 +3,8 @@
  * Dashboard Page (Index) — Main overview of the autonomous marketing team.
  *
  * Integrates KPI stats and the 4 core widgets:
- * 1. PendingNewsWidget (Agent 1 - Scraper)
- * 2. LatestCopyWidget (Agent 2 - Borradores)
+ * 1. PendingNewsWidget (Scrapy Agent - Radar de Tendencias)
+ * 2. LatestCopyWidget (Coppy-Hook Agent - Borradores)
  * 3. QualifiedLeadsWidget (Agent 3 - Leads)
  * 4. OrchestratorChatWidget (Agent 4 - Orquestador)
  */

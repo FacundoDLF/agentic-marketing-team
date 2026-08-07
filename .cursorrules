@@ -22,3 +22,17 @@ Todo nuevo Agente o Feature de IA en `server/api/agents/` debe exportar su model
 - Strict TypeScript activo: usar guardas de tipo explícitas (`if (!item) continue;`) para evitar errores por `noUncheckedIndexedAccess`.
 - Componentes modulares bajo arquitectura Feature-Sliced Design (FSD).
 - Toda refactorización debe ejecutarse y validarse con `npm test`.
+
+## 5. Formato Automático y Linting (Clean Code & Estructura)
+- **Orden Lógico de Imports**:
+  1. Dependencias externas / Framework (Vue, Nuxt, librerías npm).
+  2. Componentes / Composables / Servicios internos (`~~/features/*`, `~~/services/*`, `~~/shared/*`).
+  3. Tipos y esquemas (`type ...`, `~~/entities/*/types`).
+- **Cero Imports Muertos**: Eliminar de inmediato cualquier import no utilizado.
+- **Puntuación y Estilo**: Comillas simples (`'`), sin punto y coma (`semi: false`), coma al final en multilíneas (`trailingComma: "all"`), indentación de 2 espacios.
+- **Arquitectura Compacta**: Componentes modulares, pequeños y desacoplados (Single Responsibility Principle). Evitar archivos kilométricos.
+
+## 6. Política Estricta de Comentarios ("Cero Ruido")
+- **Prohibido el relleno de comentarios**: El código debe ser 100% autoexplicativo por medio de nombres descriptivos de variables, funciones e interfaces. Evitar saturar archivos con comentarios redundantes o descriptivos de lo obvio.
+- **Cabecera de Archivo (Opcional)**: Si es estrictamente necesario, máximo **3 a 5 líneas breves** al inicio del archivo describiendo propósito y capa FSD.
+- **Comentarios In-Line**: Únicamente permitidos si la lógica de negocio es extremadamente compleja y no se puede simplificar. Deben ser **super breves (máximo una línea y pocas palabras)**. Si se pueden omitir, **deben omitirse**.
