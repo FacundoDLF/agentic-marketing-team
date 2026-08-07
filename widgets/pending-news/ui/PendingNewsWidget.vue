@@ -39,6 +39,7 @@ import {
 } from '@lucide/vue'
 import { useScraper, type ScraperTimeframe } from '~~/features/ScraperNews'
 import { agentService } from '~~/services/agentService'
+import { AGENTS } from '~~/shared/constants/agents'
 import type { NewsIdea } from '~~/entities/news/types'
 import { cn } from '~~/shared/lib/utils'
 
@@ -162,11 +163,11 @@ async function handleGenerateCopy(item: NewsIdea): Promise<void> {
       item.copyPlatform = res.data.platform
     }
   } catch (err: any) {
-    console.error('Error generando copy con Coppy-Hook Agent:', err)
+    console.error(`Error generando copy con ${AGENTS.COPPY_HOOK.name}:`, err)
     copyError.value[item.id] =
       err?.data?.message ||
       err?.message ||
-      'Error al generar copy con Coppy-Hook Agent. Por favor reintentá.'
+      `Error al generar copy con ${AGENTS.COPPY_HOOK.name}. Por favor reintentá.`
   } finally {
     generatingCopy.value[item.id] = false
   }
@@ -226,7 +227,7 @@ function formatNewsDate(dateStr?: string): string {
           <div class="flex items-center gap-2">
             <h2 class="text-sm font-semibold tracking-tight text-foreground sm:text-base">Radar de Tendencias</h2>
             <span class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-              <Sparkles class="h-3 w-3" /> Scrapy + Coppy-Hook
+              <Sparkles class="h-3 w-3" /> {{ AGENTS.SCRAPY.name }} + {{ AGENTS.COPPY_HOOK.name }}
             </span>
           </div>
           <p class="text-xs leading-snug text-muted-foreground sm:text-sm">
@@ -366,7 +367,7 @@ function formatNewsDate(dateStr?: string): string {
       <div class="flex flex-wrap items-center justify-center gap-1.5 text-xs font-medium sm:gap-2">
         <div class="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-primary shadow-xs">
           <span class="flex h-4 w-4 items-center justify-center rounded-full bg-primary/20 text-[10px] font-semibold text-primary">1</span>
-          <span>Escaneo (Scrapy)</span>
+          <span>Escaneo ({{ AGENTS.SCRAPY.name }})</span>
         </div>
         <span class="font-normal text-muted-foreground/40">➔</span>
         <div class="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-muted/40 px-3 py-1 text-muted-foreground/70">
@@ -376,7 +377,7 @@ function formatNewsDate(dateStr?: string): string {
         <span class="font-normal text-muted-foreground/40">➔</span>
         <div class="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-muted/40 px-3 py-1 text-muted-foreground/70">
           <span class="flex h-4 w-4 items-center justify-center rounded-full bg-muted-foreground/20 text-[10px] font-semibold text-muted-foreground">3</span>
-          <span>Coppy-Hook Agent</span>
+          <span>{{ AGENTS.COPPY_HOOK.name }}</span>
         </div>
       </div>
 
@@ -414,7 +415,7 @@ function formatNewsDate(dateStr?: string): string {
           :title="anyExpanded ? 'Colapsar todas' : 'Expandir todas'"
           @click="toggleAll"
         >
-          <span>Ideas JL Masajistas</span>
+          <span>Ideas {{ AGENTS.SCRAPY.name }}</span>
           <component :is="anyExpanded ? ChevronsDownUp : ChevronsUpDown" class="h-3.5 w-3.5" />
         </button>
       </div>
@@ -516,7 +517,7 @@ function formatNewsDate(dateStr?: string): string {
             <!-- Content Idea (Rendered Markdown de Idea Cruda) -->
             <div class="flex flex-col gap-1.5">
               <span class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Idea Estratégica (Scrapy Agent)
+                Idea Estratégica ({{ AGENTS.SCRAPY.name }})
               </span>
               <div
                 v-if="item.contentIdea"
@@ -580,7 +581,7 @@ function formatNewsDate(dateStr?: string): string {
                     <Loader2 v-if="generatingCopy[item.id]" class="h-3.5 w-3.5 animate-spin" />
                     <Wand2 v-else class="h-3.5 w-3.5 text-primary-foreground" />
                     <span>
-                      {{ generatingCopy[item.id] ? 'Redactando Copy (Coppy-Hook)...' : (item.copyFormatted ? 'Regenerar Copy' : 'Generar Copy con Coppy-Hook') }}
+                      {{ generatingCopy[item.id] ? `Redactando Copy (${AGENTS.COPPY_HOOK.name})...` : (item.copyFormatted ? 'Regenerar Copy' : `Generar Copy con ${AGENTS.COPPY_HOOK.name}`) }}
                     </span>
                   </button>
 
@@ -606,7 +607,7 @@ function formatNewsDate(dateStr?: string): string {
               <div v-if="generatingCopy[item.id]" class="flex items-center justify-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-6 text-xs text-primary">
                 <Loader2 class="h-5 w-5 animate-spin" />
                 <div class="flex flex-col gap-0.5">
-                  <span class="font-semibold">Coppy-Hook Agent está creando el guión...</span>
+                  <span class="font-semibold">{{ AGENTS.COPPY_HOOK.name }} está creando el guión...</span>
                   <span class="text-[11px] text-muted-foreground">Aplicando estructura de gancho magnético, caption y hashtags para Rosario.</span>
                 </div>
               </div>

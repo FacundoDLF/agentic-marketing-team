@@ -1,16 +1,29 @@
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
+import { AGENTS } from '../shared/constants/agents'
+import { AI_MODEL as scraperModel } from '../server/api/agents/scraper.post'
+import { AI_MODEL as copyhookModel } from '../server/api/agents/copyhook.post'
 
 /**
- * ASDD Guardian Test: AI Model Governance & Right-Sizing
- * Validates that every AI agent or AI feature in server/api/agents/
- * explicitly declares its assigned AI model.
+ * ASDD Guardian Test: AI Model Governance & Single Source of Truth
+ * Validates that all AI agents have explicit models configured in AGENTS
+ * and that endpoints and UI consume the centralized single source of truth.
  */
 describe('ASDD AI Model Governance Guardian', () => {
   const agentsDir = path.resolve(process.cwd(), 'server/api/agents')
 
-  it('should verify all AI agent endpoints explicitly declare a valid AI_MODEL', () => {
+  it('should verify single source of truth (AGENTS) contains valid metadata', () => {
+    expect(AGENTS.SCRAPY.id).toBe('scrapy-agent')
+    expect(AGENTS.SCRAPY.name).toBe('Scrapy Agent')
+    expect(AGENTS.SCRAPY.model).toBe('gemini-3.5-flash-lite')
+
+    expect(AGENTS.COPPY_HOOK.id).toBe('coppy-hook-agent')
+    expect(AGENTS.COPPY_HOOK.name).toBe('Coppy-Hook Agent')
+    expect(AGENTS.COPPY_HOOK.model).toBe('gemini-3.5-flash-lite')
+  })
+
+  it('should verify all AI agent endpoints explicitly declare and export AI_MODEL from AGENTS', () => {
     expect(fs.existsSync(agentsDir)).toBe(true)
 
     const files = fs.readdirSync(agentsDir).filter((file) => file.endsWith('.ts'))
@@ -20,70 +33,45 @@ describe('ASDD AI Model Governance Guardian', () => {
       const filePath = path.join(agentsDir, file)
       const content = fs.readFileSync(filePath, 'utf-8')
 
-      // Verificar si el archivo interactúa con modelos de IA
       const usesAi =
         content.includes('@google/genai') ||
         content.includes('generateContent') ||
         content.includes('GoogleGenAI')
 
       if (usesAi) {
-        // Regex para detectar la declaración explícita de AI_MODEL
-        const modelMatch =
-          content.match(/export\s+const\s+AI_MODEL\s*=\s*['"`]([^'"`]+)['"`]/) ||
-          content.match(/const\s+AI_MODEL\s*=\s*['"`]([^'"`]+)['"`]/) ||
-          content.match(/export\s+const\s+AGENT_AI_MODEL\s*=\s*['"`]([^'"`]+)['"`]/) ||
-          content.match(/const\s+AGENT_AI_MODEL\s*=\s*['"`]([^'"`]+)['"`]/)
+        // Verificar que exporte AI_MODEL (literal o referenciando AGENTS)
+        const hasExport =
+          content.includes('export const AI_MODEL = AGENTS.') ||
+          /export\s+const\s+AI_MODEL\s*=\s*['"`]([^'"`]+)['"`]/.test(content)
 
-        if (!modelMatch || !modelMatch[1] || modelMatch[1].trim() === '') {
-          throw new Error(
-            `ASDD Error: Feature de IA sin modelo explícito asignado en el archivo: ${file}`
-          )
-        }
-
-        const declaredModel = modelMatch[1].trim()
-
-        // El modelo no puede ser nulo, indefinido ni genérico
         expect(
-          declaredModel,
-          `ASDD Error: Feature de IA sin modelo explícito asignado en ${file}`
-        ).toBeTruthy()
-
-        // Validar que pertenezca a la familia oficial de modelos Gemini
-        expect(declaredModel.startsWith('gemini-')).toBe(true)
-
-        console.info(`[ASDD Guardian] ✅ ${file} cumple la gobernanza con modelo asignado: "${declaredModel}"`)
+          hasExport,
+          `ASDD Error: Feature de IA sin AI_MODEL exportado en el archivo: ${file}`
+        ).toBe(true)
       }
     }
   })
 
-  it('should verify Scrapy Agent (scraper.post.ts) is right-sized to gemini-3.5-flash-lite', () => {
-    const scraperPath = path.join(agentsDir, 'scraper.post.ts')
-    const content = fs.readFileSync(scraperPath, 'utf-8')
-
-    const modelMatch = content.match(/export\s+const\s+AI_MODEL\s*=\s*['"`]([^'"`]+)['"`]/)
-    expect(modelMatch, 'ASDD Error: Feature de IA sin modelo explícito asignado').not.toBeNull()
-    expect(modelMatch![1]).toBe('gemini-3.5-flash-lite')
+  it('should verify Scrapy Agent (scraper.post.ts) is bound to AGENTS.SCRAPY.model', () => {
+    expect(scraperModel).toBe(AGENTS.SCRAPY.model)
+    expect(scraperModel).toBe('gemini-3.5-flash-lite')
+    console.info(`[ASDD Guardian] ✅ scraper.post.ts gobernado por AGENTS.SCRAPY.model ("${scraperModel}")`)
   })
 
   it('should verify sequential loop with 4s throttling exists in scraper.post.ts', () => {
     const scraperPath = path.join(agentsDir, 'scraper.post.ts')
     const content = fs.readFileSync(scraperPath, 'utf-8')
 
-    // Verificar que incluya setTimeout de 4000ms para throttling
     const hasThrottling =
       content.includes('setTimeout(r, 4000)') || content.includes('setTimeout(resolve, 4000)')
 
     expect(hasThrottling, 'ASDD Error: Scraper no incluye throttling de 4000ms').toBe(true)
   })
 
-  it('should verify Coppy-Hook Agent (copyhook.post.ts) exists and is right-sized to gemini-3.5-flash-lite', () => {
-    const copyhookPath = path.join(agentsDir, 'copyhook.post.ts')
-    expect(fs.existsSync(copyhookPath), 'ASDD Error: copyhook.post.ts no existe').toBe(true)
-
-    const content = fs.readFileSync(copyhookPath, 'utf-8')
-    const modelMatch = content.match(/export\s+const\s+AI_MODEL\s*=\s*['"`]([^'"`]+)['"`]/)
-    expect(modelMatch, 'ASDD Error: Feature de IA sin modelo explícito asignado en copyhook.post.ts').not.toBeNull()
-    expect(modelMatch![1]).toBe('gemini-3.5-flash-lite')
+  it('should verify Coppy-Hook Agent (copyhook.post.ts) is bound to AGENTS.COPPY_HOOK.model', () => {
+    expect(copyhookModel).toBe(AGENTS.COPPY_HOOK.model)
+    expect(copyhookModel).toBe('gemini-3.5-flash-lite')
+    console.info(`[ASDD Guardian] ✅ copyhook.post.ts gobernado por AGENTS.COPPY_HOOK.model ("${copyhookModel}")`)
   })
 
   it('should verify 4s throttling exists in copyhook.post.ts', () => {

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import type { NewsIdea, IdeaStatus } from '../../../entities/news/types'
+import { AGENTS } from '../../../shared/constants/agents'
 
 export type ScraperTimeframe = '1d' | '90d' | '180d' | 'next_15d' | 'next_30d'
 export type { IdeaStatus }
@@ -141,7 +142,7 @@ export function useScraper() {
         err?.data?.message ||
         err?.data?.statusMessage ||
         err?.message ||
-        'Error al ejecutar Scrapy Agent (News Scraper)'
+        `Error al ejecutar ${AGENTS.SCRAPY.name} (News Scraper)`
       error.value = errorMessage
       return null
     } finally {

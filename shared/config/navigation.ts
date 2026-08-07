@@ -5,6 +5,8 @@
  * used by the Sidebar, Topbar, and router.
  */
 
+import { AGENTS } from '../constants/agents'
+
 // ─── Types ──────────────────────────────────────────────────────────
 export type TabId =
   | 'dashboard'
@@ -32,8 +34,8 @@ export interface TabMeta {
 // ─── Navigation Items ───────────────────────────────────────────────
 export const navItems: NavEntry[] = [
   { id: 'dashboard', label: 'Dashboard', iconName: 'LayoutDashboard', route: '/' },
-  { id: 'scraper', label: 'Tendencias', agent: 'Scrapy Agent', iconName: 'SatelliteDishIcon', route: '/scraper' },
-  { id: 'borradores', label: 'Borradores', agent: 'Agente 2', iconName: 'FileText', route: '/borradores' },
+  { id: 'scraper', label: 'Tendencias', agent: AGENTS.SCRAPY.name, iconName: 'SatelliteDishIcon', route: '/scraper' },
+  { id: 'borradores', label: 'Borradores', agent: AGENTS.COPPY_HOOK.name, iconName: 'FileText', route: '/borradores' },
   { id: 'leads', label: 'Leads', agent: 'Agente 3', iconName: 'Users', route: '/leads' },
   { id: 'orquestador', label: 'Orquestador', agent: 'Agente 4', iconName: 'Bot', route: '/orquestador' },
   { id: 'inbox', label: 'Social Inbox', agent: 'Agente 5', iconName: 'MessageSquare', route: '/inbox' },
@@ -50,8 +52,8 @@ export const settingsEntry: NavEntry = {
 // ─── Page Metadata ──────────────────────────────────────────────────
 export const tabMeta: Record<TabId, TabMeta> = {
   dashboard: { title: 'Dashboard' },
-  scraper: { title: 'Radar de Tendencias — Scrapy Agent' },
-  borradores: { title: 'Borradores — Agente 2' },
+  scraper: { title: `Radar de Tendencias — ${AGENTS.SCRAPY.name}` },
+  borradores: { title: `Borradores — ${AGENTS.COPPY_HOOK.name}` },
   leads: { title: 'Leads — Agente 3' },
   orquestador: { title: 'Orquestador — Agente 4' },
   inbox: { title: 'Social Inbox — Agente 5' },

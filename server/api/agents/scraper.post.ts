@@ -4,6 +4,7 @@ import Parser from 'rss-parser'
 import { GoogleGenAI, Type } from '@google/genai'
 import { NewsIdeasResponseSchema, type ExtractedNews, type NewsIdea } from '../../../entities/news/types'
 import { getFirestoreDb, FieldValue } from '../../../server/utils/firebase'
+import { AGENTS } from '../../../shared/constants/agents'
 
 /**
  * ASDD AI Model Governance Declaration
@@ -11,7 +12,7 @@ import { getFirestoreDb, FieldValue } from '../../../server/utils/firebase'
  * Cognitive Complexity: Low / Repetitive Volume / Extraction & Ideation
  * Right-Sized Model Tier: Lite (gemini-3.5-flash-lite)
  */
-export const AI_MODEL = 'gemini-3.5-flash-lite'
+export const AI_MODEL = AGENTS.SCRAPY.model
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
@@ -447,7 +448,9 @@ export default defineEventHandler(async (event) => {
 
     for (let i = 0; i < targetNews.length; i++) {
       const article = targetNews[i]
-      console.info(`[Scrapy Agent] (${i + 1}/${targetNews.length}) Ideando con ${AI_MODEL}: "${article.headline.slice(0, 60)}..."`)
+      if (!article) continue
+
+      console.info(`[${AGENTS.SCRAPY.name}] (${i + 1}/${targetNews.length}) Ideando con ${AI_MODEL}: "${article.headline.slice(0, 60)}..."`)
 
       let response: any = null
       let attempts = 0
@@ -582,7 +585,7 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',
-      message: `Error en Scrapy Agent (ScraperNews): ${userFriendlyMessage}`,
+      message: `Error en ${AGENTS.SCRAPY.name} (ScraperNews): ${userFriendlyMessage}`,
     })
   }
 })

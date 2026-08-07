@@ -1,6 +1,7 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { GoogleGenAI, Type } from '@google/genai'
 import { getFirestoreDb, FieldValue } from '../../../server/utils/firebase'
+import { AGENTS } from '../../../shared/constants/agents'
 
 /**
  * ASDD AI Model Governance Declaration
@@ -8,12 +9,12 @@ import { getFirestoreDb, FieldValue } from '../../../server/utils/firebase'
  * Cognitive Complexity: Low-Medium / High-Volume Copywriting & Scripting
  * Right-Sized Model Tier: Lite (gemini-3.5-flash-lite)
  */
-export const AI_MODEL = 'gemini-3.5-flash-lite'
+export const AI_MODEL = AGENTS.COPPY_HOOK.model
 
 /**
  * System Prompt: Coppy-Hook Agent (La Persona)
  */
-const systemInstruction = `Eres "Coppy-Hook Agent", el Social Media Copywriter y Guionista Creativo Senior especializado en Kinesiología, Masajes Terapéuticos y Bienestar para "JL Masajistas" en Rosario (Santa Fe, Argentina).
+const systemInstruction = `Eres "${AGENTS.COPPY_HOOK.name}", el Social Media Copywriter y Guionista Creativo Senior especializado en Kinesiología, Masajes Terapéuticos y Bienestar para "JL Masajistas" en Rosario (Santa Fe, Argentina).
 
 TU MISIÓN:
 Tomar una idea estratégica cruda y su contexto de noticia real para transformarla en una pieza de contenido y copy de alto impacto lista para publicar en la plataforma seleccionada (ej. Instagram Reel, TikTok, Carrusel de Instagram, YouTube Short, LinkedIn).
@@ -262,7 +263,7 @@ ${parsed.cta || 'Comentá o envianos un mensaje directo para coordinar tu sesió
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal Server Error',
-      message: `Error en Coppy-Hook Agent: ${userFriendlyMessage}`,
+      message: `Error en ${AGENTS.COPPY_HOOK.name}: ${userFriendlyMessage}`,
     })
   }
 })
