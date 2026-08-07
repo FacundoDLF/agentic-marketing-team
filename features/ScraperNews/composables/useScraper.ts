@@ -1,6 +1,10 @@
+/**
+ * Composable for managing Scrapy Agent operations, quota, and idea lifecycle.
+ * Layer: features/ScraperNews/composables
+ */
 import { ref, computed } from 'vue'
-import type { NewsIdea, IdeaStatus } from '../../../entities/news/types'
 import { AGENTS } from '../../../shared/constants/agents'
+import type { NewsIdea, IdeaStatus } from '../../../entities/news/types'
 
 export type ScraperTimeframe = '1d' | '90d' | '180d' | 'next_15d' | 'next_30d'
 export type { IdeaStatus }
@@ -18,24 +22,16 @@ export interface TriggerScraperOptions {
   manualUrl?: string
 }
 
-/**
- * Composable for managing Scrapy Agent (Agent 1) operations, quota, and idea statuses.
- * FSD Layer: features/ScraperNews/composables
- */
 export function useScraper() {
   const loading = ref<boolean>(false)
   const fetchingIdeas = ref<boolean>(false)
   const error = ref<string | null>(null)
   const ideas = ref<NewsIdea[]>([])
 
-  // Status message flags
   const toastBandejaLlena = ref<boolean>(false)
   const toastRssAgotado = ref<boolean>(false)
   const toastUrlDuplicada = ref<boolean>(false)
 
-  /**
-   * Fetches active ideas (pending_review + approved) from Firestore via GET /api/ideas
-   */
   const fetchIdeas = async (): Promise<NewsIdea[]> => {
     fetchingIdeas.value = true
     error.value = null
@@ -51,19 +47,11 @@ export function useScraper() {
     }
   }
 
-  /**
-   * Updates an idea status in Firestore and synchronizes local state:
-   * - 'rejected': removes from view (frees quota)
-   * - 'approved': stays in view with approved UI (frees quota for next scan)
-   * - 'archived': removes from view (moves to history)
-   */
   const updateIdeaStatus = async (id: string, newStatus: IdeaStatus): Promise<boolean> => {
-    // Reset toast banners on user action
     toastBandejaLlena.value = false
     toastRssAgotado.value = false
     toastUrlDuplicada.value = false
 
-    // Optimistic local update
     if (newStatus === 'rejected' || newStatus === 'archived') {
       ideas.value = ideas.value.filter((i) => i.id !== id)
     } else {
@@ -81,18 +69,13 @@ export function useScraper() {
       return true
     } catch (err: any) {
       console.error('Error al actualizar estado en Firestore:', err)
-      // Rollback
       await fetchIdeas()
       return false
     }
   }
 
-  /**
-   * Triggers manual or automated execution of the Scraper & Content Ideation agent.
-   * Accepts either a timeframe string or an options object with manualUrl.
-   */
   const triggerScraper = async (
-    options: TriggerScraperOptions | ScraperTimeframe = '1d'
+    options: TriggerScraperOptions | ScraperTimeframe = '1d',
   ): Promise<NewsIdea[] | null> => {
     loading.value = true
     error.value = null
@@ -130,7 +113,6 @@ export function useScraper() {
       }
 
       if (response.data && response.data.length > 0) {
-        // Merge fresh ideas at the beginning, avoiding duplicate IDs
         const existingIds = new Set(ideas.value.map((i) => i.id))
         const fresh = response.data.filter((i) => !existingIds.has(i.id))
         ideas.value = [...fresh, ...ideas.value]
@@ -151,11 +133,11 @@ export function useScraper() {
   }
 
   const pendingCount = computed(() =>
-    ideas.value.filter((i) => i.status === 'pending_review').length
+    ideas.value.filter((i) => i.status === 'pending_review').length,
   )
 
   const approvedCount = computed(() =>
-    ideas.value.filter((i) => i.status === 'approved').length
+    ideas.value.filter((i) => i.status === 'approved').length,
   )
 
   return {

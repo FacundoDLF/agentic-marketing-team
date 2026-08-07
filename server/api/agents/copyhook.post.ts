@@ -4,10 +4,8 @@ import { getFirestoreDb, FieldValue } from '../../../server/utils/firebase'
 import { AGENTS } from '../../../shared/constants/agents'
 
 /**
- * ASDD AI Model Governance Declaration
- * Agent: Coppy-Hook Agent (Creative Copywriter & Scriptwriter)
- * Cognitive Complexity: Low-Medium / High-Volume Copywriting & Scripting
- * Right-Sized Model Tier: Lite (gemini-3.5-flash-lite)
+ * ASDD AI Model Governance: Coppy-Hook Agent (Creative Copywriter & Scriptwriter)
+ * Layer: server/api/agents
  */
 export const AI_MODEL = AGENTS.COPPY_HOOK.model
 

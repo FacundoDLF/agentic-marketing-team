@@ -2,15 +2,13 @@ import { defineEventHandler, createError } from 'h3'
 import { randomUUID } from 'node:crypto'
 import Parser from 'rss-parser'
 import { GoogleGenAI, Type } from '@google/genai'
-import { NewsIdeasResponseSchema, type ExtractedNews, type NewsIdea } from '../../../entities/news/types'
 import { getFirestoreDb, FieldValue } from '../../../server/utils/firebase'
 import { AGENTS } from '../../../shared/constants/agents'
+import { NewsIdeasResponseSchema, type ExtractedNews, type NewsIdea } from '../../../entities/news/types'
 
 /**
- * ASDD AI Model Governance Declaration
- * Agent: Scrapy Agent (Agent 1 - News Scraper & Content Ideation)
- * Cognitive Complexity: Low / Repetitive Volume / Extraction & Ideation
- * Right-Sized Model Tier: Lite (gemini-3.5-flash-lite)
+ * ASDD AI Model Governance: Scrapy Agent (News Scraper & Content Ideation)
+ * Layer: server/api/agents
  */
 export const AI_MODEL = AGENTS.SCRAPY.model
 

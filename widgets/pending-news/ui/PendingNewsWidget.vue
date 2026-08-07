@@ -1,14 +1,7 @@
 <script setup lang="ts">
 /**
- * PendingNewsWidget — Radar de Tendencias & Coppy-Hook Agent UI.
- *
- * Implements:
- * 1. Radar de Tendencias (Scrapy Agent) with inbox quota & deduplication.
- * 2. Multi-state lifecycle ('pending_review', 'approved', 'copy_generating', 'copy_ready', 'archived').
- * 3. Platform selector & Coppy-Hook Agent trigger.
- * 4. Structured copy breakdown (Hook, Cuerpo/Guión, Caption, Hashtags, CTA) with One-Click Copy buttons.
- *
- * FSD Layer: widgets/pending-news
+ * PendingNewsWidget: Radar de Tendencias and Coppy-Hook Agent UI.
+ * Layer: widgets/pending-news
  */
 import { ref, computed, onMounted } from 'vue'
 import { marked } from 'marked'
@@ -40,8 +33,8 @@ import {
 import { useScraper, type ScraperTimeframe } from '~~/features/ScraperNews'
 import { agentService } from '~~/services/agentService'
 import { AGENTS } from '~~/shared/constants/agents'
-import type { NewsIdea } from '~~/entities/news/types'
 import { cn } from '~~/shared/lib/utils'
+import type { NewsIdea } from '~~/entities/news/types'
 
 const {
   loading,

@@ -1,8 +1,9 @@
+/**
+ * News and Content Idea Schemas and Types.
+ * Layer: entities/news
+ */
 import { z } from 'zod'
 
-/**
- * Idea Lifecycle States (ASDD Governance)
- */
 export type IdeaStatus =
   | 'pending'
   | 'pending_review'
@@ -12,9 +13,6 @@ export type IdeaStatus =
   | 'rejected'
   | 'archived'
 
-/**
- * Structured Copy Sections from Coppy-Hook Agent
- */
 export interface CopySections {
   hook: string
   body: string
@@ -23,10 +21,6 @@ export interface CopySections {
   cta: string
 }
 
-/**
- * Zod Schema for News Idea
- * Firestore Collection: news_ideas
- */
 export const NewsIdeaSchema = z.object({
   id: z.string().uuid({ message: 'Must be a valid UUID' }),
   sourceUrl: z.string().url({ message: 'Must be a valid URL' }),
@@ -49,24 +43,14 @@ export const NewsIdeaSchema = z.object({
   createdAt: z.union([z.string(), z.number(), z.date()]),
 })
 
-/**
- * TypeScript Interface inferred from Zod Schema
- */
 export type NewsIdea = z.infer<typeof NewsIdeaSchema>
 
-/**
- * Array schema for batch ideas output
- */
 export const NewsIdeasResponseSchema = z.array(NewsIdeaSchema)
 export type NewsIdeasResponse = z.infer<typeof NewsIdeasResponseSchema>
 
-/**
- * News item extracted from web sources (Pipeline Step 1)
- */
 export interface ExtractedNews {
   headline: string
   sourceUrl: string
   snippet: string
   publishedAt: string
 }
-

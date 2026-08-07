@@ -1,15 +1,13 @@
-import { describe, it, expect } from 'vitest'
+/**
+ * ASDD Guardian Test: AI Model Governance & Single Source of Truth
+ */
 import fs from 'node:fs'
 import path from 'node:path'
+import { describe, it, expect } from 'vitest'
 import { AGENTS } from '../shared/constants/agents'
 import { AI_MODEL as scraperModel } from '../server/api/agents/scraper.post'
 import { AI_MODEL as copyhookModel } from '../server/api/agents/copyhook.post'
 
-/**
- * ASDD Guardian Test: AI Model Governance & Single Source of Truth
- * Validates that all AI agents have explicit models configured in AGENTS
- * and that endpoints and UI consume the centralized single source of truth.
- */
 describe('ASDD AI Model Governance Guardian', () => {
   const agentsDir = path.resolve(process.cwd(), 'server/api/agents')
 
@@ -39,14 +37,13 @@ describe('ASDD AI Model Governance Guardian', () => {
         content.includes('GoogleGenAI')
 
       if (usesAi) {
-        // Verificar que exporte AI_MODEL (literal o referenciando AGENTS)
         const hasExport =
           content.includes('export const AI_MODEL = AGENTS.') ||
           /export\s+const\s+AI_MODEL\s*=\s*['"`]([^'"`]+)['"`]/.test(content)
 
         expect(
           hasExport,
-          `ASDD Error: Feature de IA sin AI_MODEL exportado en el archivo: ${file}`
+          `ASDD Error: Feature de IA sin AI_MODEL exportado en el archivo: ${file}`,
         ).toBe(true)
       }
     }
