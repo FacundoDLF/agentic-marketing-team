@@ -86,17 +86,33 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event).catch(() => ({}))
-    const headline = typeof body?.headline === 'string' ? body.headline.trim() : ''
-    const contentIdea = typeof body?.contentIdea === 'string' ? body.contentIdea.trim() : ''
+    let headline = typeof body?.headline === 'string' ? body.headline.trim() : ''
+    let contentIdea = typeof body?.contentIdea === 'string' ? body.contentIdea.trim() : ''
     const platform = typeof body?.platform === 'string' ? body.platform.trim() : 'Instagram Reel'
-    const sourceUrl = typeof body?.sourceUrl === 'string' ? body.sourceUrl.trim() : ''
+    let sourceUrl = typeof body?.sourceUrl === 'string' ? body.sourceUrl.trim() : ''
     const ideaId = typeof body?.ideaId === 'string' ? body.ideaId.trim() : ''
+
+    // Si se pasa ideaId pero no headline o contentIdea, cargarlos de Firestore
+    if (ideaId && (!headline || !contentIdea)) {
+      try {
+        const firestore = getFirestoreDb()
+        const docSnap = await firestore.collection('news_ideas').doc(ideaId).get()
+        if (docSnap.exists) {
+          const docData = docSnap.data()
+          if (!headline && docData?.headline) headline = docData.headline
+          if (!contentIdea && docData?.contentIdea) contentIdea = docData.contentIdea
+          if (!sourceUrl && docData?.sourceUrl) sourceUrl = docData.sourceUrl
+        }
+      } catch (fsErr: any) {
+        console.warn(`[Coppy-Hook Agent] Error al consultar Firestore para ideaId ${ideaId}:`, fsErr?.message)
+      }
+    }
 
     if (!headline || !contentIdea) {
       throw createError({
         statusCode: 400,
         statusMessage: 'Bad Request',
-        message: 'Faltan parámetros obligatorios: headline y contentIdea son requeridos.',
+        message: 'Faltan parámetros obligatorios: headline y contentIdea son requeridos (o un ideaId válido).',
       })
     }
 
@@ -194,6 +210,7 @@ ${parsed.cta || 'Comentá o envianos un mensaje directo para coordinar tu sesió
         const firestore = getFirestoreDb()
         const docRef = firestore.collection('news_ideas').doc(ideaId)
         await docRef.update({
+          status: 'copy_ready',
           copyFormatted: structuredCopy,
           copySections: {
             hook: parsed.hook || '',

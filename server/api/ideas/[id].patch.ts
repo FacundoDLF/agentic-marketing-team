@@ -1,7 +1,15 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { getFirestoreDb, FieldValue } from '../../../server/utils/firebase'
 
-const ALLOWED_STATUSES = ['pending_review', 'approved', 'rejected', 'archived'] as const
+const ALLOWED_STATUSES = [
+  'pending',
+  'pending_review',
+  'approved',
+  'copy_generating',
+  'copy_ready',
+  'rejected',
+  'archived',
+] as const
 
 /**
  * PATCH /api/ideas/:id

@@ -1,7 +1,30 @@
 import { z } from 'zod'
 
 /**
- * Zod Schema for News Idea (Section 5 - Feature Spec Agente 1)
+ * Idea Lifecycle States (ASDD Governance)
+ */
+export type IdeaStatus =
+  | 'pending'
+  | 'pending_review'
+  | 'approved'
+  | 'copy_generating'
+  | 'copy_ready'
+  | 'rejected'
+  | 'archived'
+
+/**
+ * Structured Copy Sections from Coppy-Hook Agent
+ */
+export interface CopySections {
+  hook: string
+  body: string
+  caption: string
+  hashtags: string[]
+  cta: string
+}
+
+/**
+ * Zod Schema for News Idea
  * Firestore Collection: news_ideas
  */
 export const NewsIdeaSchema = z.object({
@@ -12,6 +35,17 @@ export const NewsIdeaSchema = z.object({
   platforms: z.array(z.string()).min(1, { message: 'At least one platform is required' }),
   publishedAt: z.string().optional(),
   status: z.string().default('pending_review'),
+  copyFormatted: z.string().optional(),
+  copySections: z
+    .object({
+      hook: z.string(),
+      body: z.string(),
+      caption: z.string(),
+      hashtags: z.array(z.string()),
+      cta: z.string(),
+    })
+    .optional(),
+  copyPlatform: z.string().optional(),
   createdAt: z.union([z.string(), z.number(), z.date()]),
 })
 
@@ -35,3 +69,4 @@ export interface ExtractedNews {
   snippet: string
   publishedAt: string
 }
+

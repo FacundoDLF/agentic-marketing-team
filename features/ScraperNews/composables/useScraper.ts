@@ -1,8 +1,8 @@
 import { ref, computed } from 'vue'
-import type { NewsIdea } from '../../../entities/news/types'
+import type { NewsIdea, IdeaStatus } from '../../../entities/news/types'
 
 export type ScraperTimeframe = '1d' | '90d' | '180d' | 'next_15d' | 'next_30d'
-export type IdeaStatus = 'pending_review' | 'approved' | 'rejected' | 'archived'
+export type { IdeaStatus }
 
 export interface ScraperApiResponse {
   success: boolean

@@ -12,7 +12,7 @@ export default defineEventHandler(async () => {
     const firestore = getFirestoreDb()
     const snapshot = await firestore
       .collection('news_ideas')
-      .where('status', 'in', ['pending_review', 'approved'])
+      .where('status', 'in', ['pending', 'pending_review', 'approved', 'copy_generating', 'copy_ready'])
       .get()
 
     const ideas: NewsIdea[] = []
@@ -34,6 +34,9 @@ export default defineEventHandler(async () => {
         platforms: Array.isArray(data.platforms) ? data.platforms : ['Instagram Reel'],
         publishedAt: data.publishedAt || createdAtStr,
         status: data.status || 'pending_review',
+        copyFormatted: data.copyFormatted || undefined,
+        copySections: data.copySections || undefined,
+        copyPlatform: data.copyPlatform || undefined,
         createdAt: createdAtStr,
       })
     })
