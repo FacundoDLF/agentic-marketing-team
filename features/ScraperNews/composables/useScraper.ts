@@ -106,18 +106,18 @@ export function useScraper() {
   const updateIdeaCopy = (
     id: string,
     copyData: {
-      copyFormatted: string
-      copySections: CopySections
-      copyPlatform: string
+      copyFormatted?: string
+      copySections?: CopySections
+      copyPlatform?: string
       status?: IdeaStatus
     },
   ): void => {
     const target = ideas.value.find((i) => i.id === id)
     if (target) {
-      target.copyFormatted = copyData.copyFormatted
-      target.copySections = copyData.copySections
-      target.copyPlatform = copyData.copyPlatform
-      target.status = copyData.status || 'copy_ready'
+      if (copyData.copyFormatted !== undefined) target.copyFormatted = copyData.copyFormatted
+      if (copyData.copySections !== undefined) target.copySections = copyData.copySections
+      if (copyData.copyPlatform !== undefined) target.copyPlatform = copyData.copyPlatform
+      if (copyData.status !== undefined) target.status = copyData.status
     }
   }
 

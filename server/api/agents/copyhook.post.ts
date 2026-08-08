@@ -91,6 +91,8 @@ export default defineEventHandler(async (event) => {
     const platform = typeof body?.platform === 'string' ? body.platform.trim() : 'Instagram Reel'
     let sourceUrl = typeof body?.sourceUrl === 'string' ? body.sourceUrl.trim() : ''
     const ideaId = typeof body?.ideaId === 'string' ? body.ideaId.trim() : ''
+    const targetField = typeof body?.targetField === 'string' ? body.targetField.trim() : undefined
+    const currentSections = body?.currentSections && typeof body.currentSections === 'object' ? body.currentSections : undefined
 
     // Si se pasa ideaId pero no headline o contentIdea, cargarlos de Firestore
     if (ideaId && (!headline || !contentIdea)) {
@@ -121,7 +123,7 @@ export default defineEventHandler(async (event) => {
     }
 
     console.info(
-      `[Coppy-Hook Agent] Iniciando redacción para plataforma: "${platform}" con modelo ${AI_MODEL}`,
+      `[Coppy-Hook Agent] Iniciando redacción para plataforma: "${platform}" ${targetField ? `(Campo objetivo: ${targetField})` : ''} con modelo ${AI_MODEL}`,
     )
 
     // --- ASDD Throttling obligatorio: Pausa de 4 segundos ---
@@ -130,14 +132,21 @@ export default defineEventHandler(async (event) => {
 
     const ai = new GoogleGenAI({ apiKey })
 
-    const userPrompt = `INFORMACIÓN DE ENTRADA:
+    let userPrompt = `INFORMACIÓN DE ENTRADA:
 - Titular de Noticia / Contexto: "${headline}"
 - Idea Estratégica Base: "${contentIdea}"
 - Plataforma Objetivo: "${platform}"
-${sourceUrl ? `- Fuente original: "${sourceUrl}"` : ''}
+${sourceUrl ? `- Fuente original: "${sourceUrl}"` : ''}`
 
-INSTRUCCIONES:
+    if (targetField) {
+      userPrompt += `\n\nOBJETIVO ESPECÍFICO DE REGENERACIÓN:
+Regenera una propuesta fresca, creativa y de alto impacto para la sección "${targetField}".
+${currentSections ? `Contenido actual existente: ${JSON.stringify(currentSections)}` : ''}
+Mantén el tono empático, profesional y local de JL Masajistas en Rosario, devolviendo el JSON completo con "${targetField}" renovado.`
+    } else {
+      userPrompt += `\n\nINSTRUCCIONES:
 Redacta el copy definitivo optimizado específicamente para ${platform} siguiendo la personalidad de JL Masajistas y generando todas las secciones obligatorias.`
+    }
 
     let response: any = null
     let attempts = 0

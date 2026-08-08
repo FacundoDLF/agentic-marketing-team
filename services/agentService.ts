@@ -8,6 +8,8 @@ export interface GenerateCopyOptions {
   headline?: string
   contentIdea?: string
   sourceUrl?: string
+  targetField?: 'hook' | 'body' | 'caption' | 'cta' | 'hashtags'
+  currentSections?: CopySections
 }
 
 export interface GenerateCopyResponse {
@@ -18,6 +20,7 @@ export interface GenerateCopyResponse {
     formattedCopy: string
     sections: CopySections
   }
+  error?: string
   model: string
   executedAt: string
 }
@@ -36,6 +39,8 @@ export const agentService = {
         headline: extra?.headline,
         contentIdea: extra?.contentIdea,
         sourceUrl: extra?.sourceUrl,
+        targetField: extra?.targetField,
+        currentSections: extra?.currentSections,
       },
     })
   },

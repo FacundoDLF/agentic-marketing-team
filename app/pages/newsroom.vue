@@ -3,7 +3,7 @@ import { NewsroomWidget } from '~~/widgets'
 </script>
 
 <template>
-  <div class="flex flex-col gap-6">
+  <div class="h-[calc(100vh-7.5rem)] md:h-[calc(100vh-8rem)] w-full overflow-hidden">
     <NewsroomWidget />
   </div>
 </template>

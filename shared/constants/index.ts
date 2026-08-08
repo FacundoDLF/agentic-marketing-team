@@ -4,3 +4,4 @@
  */
 export * from './agents'
 export * from './sections'
+export * from './platforms'
